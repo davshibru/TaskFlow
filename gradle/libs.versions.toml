@@ -9,6 +9,7 @@ lifecycleRuntimeKtx = "2.10.0"
 activityCompose = "1.12.0"
 composeBom = "2024.04.01"
 hilt = "2.50"
+kotlinCompilerExtensionVersion = "1.5.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -36,3 +37,5 @@ hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.r
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 
+android-application-convention = { id = "com.davidshibru.convention.application.convention" }
+compose-convention = { id = "com.davidshibru.convention.compose.convention" }
