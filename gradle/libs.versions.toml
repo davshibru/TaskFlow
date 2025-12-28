@@ -1,6 +1,7 @@
 [versions]
 agp = "8.13.2"
 kotlin = "1.9.0"
+ksp = "1.9.0-1.0.13"
 coreKtx = "1.17.0"
 junit = "4.13.2"
 junitVersion = "1.3.0"
@@ -34,8 +35,13 @@ hilt-core = { group = "com.google.dagger", name = "hilt-android", version.ref = 
 hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
 
 [plugins]
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 
-android-application-convention = { id = "com.davidshibru.convention.application.convention" }
-compose-convention = { id = "com.davidshibru.convention.compose.convention" }
+
+convention-android-application = { id = "com.davidshibru.convention.application.convention" }
+convention-compose = { id = "com.davidshibru.convention.compose.convention" }
+convention-hilt = { id = "com.davidshibru.convention.hilt.convention" }

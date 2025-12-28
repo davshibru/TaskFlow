@@ -7,39 +7,42 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.kotlin.dsl.configure
+import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.getByType
 
-class ComposeConventionPlugin : Plugin<Project> {
+class HiltConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) {
-        println("*** ComposeConventionPlugin invoked ***")
+        println("*** HiltConventionPlugin invoked ***")
 
         with(target) {
             pluginManager.withPlugin("com.android.application") {
                 extensions.configure<ApplicationExtension> {
-                    configureCompose(this)
+                    configureHiltConvention(this)
                 }
             }
 
             pluginManager.withPlugin("com.android.library") {
                 extensions.configure<LibraryExtension> {
-                    configureCompose(this)
+                    configureHiltConvention(this)
                 }
             }
+
         }
     }
 }
 
-private fun Project.configureCompose(commonExtension: CommonExtension<*, *, *, *, *, *>) {
+private fun Project.configureHiltConvention(commonExtension: CommonExtension<*, *, *, *, *, *>) {
     val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
 
     commonExtension.apply {
-        buildFeatures {
-            compose = true
-        }
+        pluginManager.apply("com.google.devtools.ksp")
+        pluginManager.apply("com.google.dagger.hilt.android")
 
-        composeOptions {
-            kotlinCompilerExtensionVersion =
-                libs.findVersion("kotlinCompilerExtensionVersion").get().toString()
+        dependencies {
+            val hilt = libs.findLibrary("hilt-core").get()
+            add("implementation", hilt)
+            val hiltCompiler = libs.findLibrary("hilt-compiler").get()
+            add("ksp", hiltCompiler)
         }
     }
 }

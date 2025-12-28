@@ -24,5 +24,9 @@ gradlePlugin {
             id = "com.davidshibru.convention.compose.convention"
             implementationClass = "com.davidshibru.convention.ComposeConventionPlugin"
         }
+        create("hilt-convention") {
+            id = "com.davidshibru.convention.hilt.convention"
+            implementationClass = "com.davidshibru.convention.HiltConventionPlugin"
+        }
     }
 }
