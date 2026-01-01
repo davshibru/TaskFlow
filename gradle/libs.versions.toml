@@ -1,5 +1,6 @@
 [versions]
 agp = "8.13.2"
+ksp = "1.9.0-1.0.13"
 kotlin = "1.9.0"
 coreKtx = "1.17.0"
 junit = "4.13.2"
@@ -9,6 +10,7 @@ lifecycleRuntimeKtx = "2.10.0"
 activityCompose = "1.12.0"
 composeBom = "2024.04.01"
 hilt = "2.50"
+kotlinCompilerExtensionVersion = "1.5.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -35,4 +37,11 @@ hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.r
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp"}
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt"}
+
+convention-android-application = { id = "com.davidshibru.convention.application.android" }
+convention-compose = { id = "com.davidshibru.convention.compose" }
+convention-hilt = { id = "com.davidshibru.convention.hilt" }
 
