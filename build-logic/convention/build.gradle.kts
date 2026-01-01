@@ -28,5 +28,9 @@ gradlePlugin {
             id = "com.davidshibru.convention.hilt.convention"
             implementationClass = "com.davidshibru.convention.HiltConventionPlugin"
         }
+        create("andrpod-library-convention") {
+            id = "com.davidshibru.convention.android.library.convention"
+            implementationClass = "com.davidshibru.convention.AndroidLibraryConventionPlugin"
+        }
     }
 }

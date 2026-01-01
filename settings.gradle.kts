@@ -13,6 +13,7 @@ pluginManagement {
     }
 }
 dependencyResolutionManagement {
+    enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
@@ -22,4 +23,14 @@ dependencyResolutionManagement {
 
 rootProject.name = "TaskFlow"
 include(":app")
- 
+include(":domain")
+include(":core:common")
+include(":core:ui")
+include(":core:navigation")
+include(":data:api")
+include(":data:impl")
+include(":feature:splash:api")
+include(":feature:splash:impl")
+include(":feature:auth:api")
+include(":feature:auth:impl")
+include(":core:entry")

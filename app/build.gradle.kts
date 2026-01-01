@@ -16,6 +16,10 @@ android {
 }
 
 dependencies {
+    implementation(projects.core.navigation)
+
+    implementation(projects.feature.splash.impl)
+    implementation(projects.feature.auth.impl)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
