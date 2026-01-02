@@ -25,11 +25,11 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
 
 private fun Project.configureAndroidApplication(applicationExtension: ApplicationExtension) {
     applicationExtension.apply {
-        compileSdk = 36
+        compileSdk = Const.TARGET_SDK
 
         defaultConfig {
-            minSdk = 26
-            targetSdk = 36
+            minSdk = Const.MIN_SDK
+            targetSdk = Const.TARGET_SDK
 
             testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
             vectorDrawables {

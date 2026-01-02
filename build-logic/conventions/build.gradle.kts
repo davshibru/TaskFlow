@@ -20,6 +20,10 @@ gradlePlugin {
             id = "com.davidshibru.conventions.android.application"
             implementationClass = "com.davidshibru.conventions.AndroidApplicationConventionPlugin"
         }
+        create("android-library") {
+            id = "com.davidshibru.conventions.android.library"
+            implementationClass = "com.davidshibru.conventions.AndroidLibraryConventionPlugin"
+        }
         create("compose") {
             id = "com.davidshibru.conventions.compose"
             implementationClass = "com.davidshibru.conventions.ComposeConventionPlugin"

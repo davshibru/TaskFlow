@@ -17,6 +17,10 @@ android {
 }
 
 dependencies {
+    implementation(projects.core.navigation)
+
+    implementation(projects.feature.splash.impl)
+    implementation(projects.feature.auth.impl)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -33,4 +37,8 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.navigation.runtime.ktx)
 }
