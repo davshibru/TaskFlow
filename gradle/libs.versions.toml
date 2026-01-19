@@ -36,3 +36,5 @@ hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.r
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 
+convention-android-application = { id = "com.davidshibru.convention.android.application" }
+
