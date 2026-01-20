@@ -25,6 +25,12 @@
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/build-logic" />
             <option value="$PROJECT_DIR$/build-logic/convention" />
+            <option value="$PROJECT_DIR$/templates" />
+            <option value="$PROJECT_DIR$/templates/android-library" />
+            <option value="$PROJECT_DIR$/templates/feature" />
+            <option value="$PROJECT_DIR$/templates/feature/domain" />
+            <option value="$PROJECT_DIR$/templates/feature/presentation" />
+            <option value="$PROJECT_DIR$/templates/kotlin-libraty" />
           </set>
         </option>
       </GradleProjectSettings>

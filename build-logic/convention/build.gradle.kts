@@ -20,6 +20,14 @@ gradlePlugin {
             id = "com.davidshibru.convention.android.application"
             implementationClass = "com.davidshibru.convention.AndroidApplicationConventionPlugin"
         }
+        create("androidLibrary") {
+            id = "com.davidshibru.convention.android.library"
+            implementationClass = "com.davidshibru.convention.AndroidLibraryConventionPlugin"
+        }
+        create("koltinLibrary") {
+            id = "com.davidshibru.convention.kotlin.library"
+            implementationClass = "com.davidshibru.convention.KotlinLibraryConventionPlugin"
+        }
         create("compose") {
             id = "com.davidshibru.convention.compose"
             implementationClass = "com.davidshibru.convention.ComposeConventionPlugin"

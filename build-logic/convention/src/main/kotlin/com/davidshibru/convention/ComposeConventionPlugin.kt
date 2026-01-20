@@ -14,12 +14,12 @@ class ComposeConventionPlugin : Plugin<Project> {
         println("*** ComposeConventionPlugin invoke ***")
 
         pluginManager.withPlugin("com.android.application") {
-            extensions.configure<ApplicationExtension>() {
+            extensions.configure<ApplicationExtension> {
                 configureComposeConvention(this)
             }
         }
         pluginManager.withPlugin("com.android.library") {
-            extensions.configure<LibraryExtension>() {
+            extensions.configure<LibraryExtension> {
                 configureComposeConvention(this)
             }
         }

@@ -12,6 +12,9 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -22,4 +25,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "TaskFlow"
 include(":app")
- 
+include(":templates:android-library")
+include(":templates:kotlin-libraty")
+include(":templates:feature:domain")
+include(":templates:feature:presentation")
