@@ -1,5 +1,7 @@
 plugins {
     alias(libs.plugins.convention.android.application)
+    alias(libs.plugins.convention.compose)
+    alias(libs.plugins.convention.hilt)
 }
 
 android {
@@ -20,12 +22,6 @@ android {
                 "proguard-rules.pro"
             )
         }
-    }
-    buildFeatures {
-        compose = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
     }
 }
 

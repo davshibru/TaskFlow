@@ -20,5 +20,13 @@ gradlePlugin {
             id = "com.davidshibru.convention.android.application"
             implementationClass = "com.davidshibru.convention.AndroidApplicationConventionPlugin"
         }
+        create("compose") {
+            id = "com.davidshibru.convention.compose"
+            implementationClass = "com.davidshibru.convention.ComposeConventionPlugin"
+        }
+        create("hilt") {
+            id = "com.davidshibru.convention.hilt"
+            implementationClass = "com.davidshibru.convention.HiltConventionPlugin"
+        }
     }
 }
