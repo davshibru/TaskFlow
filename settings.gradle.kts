@@ -25,6 +25,10 @@ dependencyResolutionManagement {
 
 rootProject.name = "TaskFlow"
 include(":app")
+include(":core:essentials")
+include(":core:common-android")
+
+
 include(":templates:android-library")
 include(":templates:kotlin-libraty")
 include(":templates:feature:domain")

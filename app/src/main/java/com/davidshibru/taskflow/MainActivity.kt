@@ -11,22 +11,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.davidshibru.taskflow.core.essentials.logger.Logger
 import com.davidshibru.taskflow.ui.theme.TaskFlowTheme
-import com.davidshibru.templates.android_library.TestAndroidLibrary
-import com.davidshibru.templates.feature.domain.FeatureDomain
-import com.davidshibru.templates.kotlin_libraty.TestKotlinLib
-import com.davidshibru.templates.feature.presentation.FeaturePresentation
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        TestAndroidLibrary()
-        TestKotlinLib()
-
-        FeatureDomain()
-        FeaturePresentation()
+        Logger.d("Hello world")
 
         setContent {
             TaskFlowTheme {
