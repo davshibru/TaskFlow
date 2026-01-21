@@ -28,6 +28,8 @@ include(":app")
 include(":core:essentials")
 include(":core:common-android")
 
+include(":features:init:domain")
+include(":features:init:presentation")
 
 include(":templates:android-library")
 include(":templates:kotlin-libraty")
