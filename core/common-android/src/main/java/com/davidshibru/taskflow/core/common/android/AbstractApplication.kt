@@ -9,6 +9,6 @@ abstract class AbstractApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         Timber.plant(Timber.DebugTree())
-        Logger.set(AndroidLogger)
+        Logger.set(AndroidLogger())
     }
 }
