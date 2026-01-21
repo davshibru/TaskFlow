@@ -1,7 +1,7 @@
 package com.davidshibru.taskflow.feature.init.presentation
 
 import android.content.Context
-import com.davidshibru.taskflow.feature.init.domain.InitStringProvider
+import com.davidshibru.taskflow.feature.init.domain.resources.InitStringProvider
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 

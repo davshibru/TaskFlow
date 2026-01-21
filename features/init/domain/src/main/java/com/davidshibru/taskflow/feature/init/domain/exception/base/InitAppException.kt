@@ -1,9 +1,9 @@
-package com.davidshibru.taskflow.feature.init.domain
+package com.davidshibru.taskflow.feature.init.domain.exception.base
 
 import com.davidshibru.taskflow.core.essentials.exceptions.base.AppExceptions
-import com.davidshibru.taskflow.core.essentials.resources.StringProviderStore
 import com.davidshibru.taskflow.core.essentials.exceptions.base.WithLocalizedMessage
-
+import com.davidshibru.taskflow.core.essentials.resources.StringProviderStore
+import com.davidshibru.taskflow.feature.init.domain.resources.InitStringProvider
 
 abstract class InitAppException(
     message: String,
@@ -14,10 +14,4 @@ abstract class InitAppException(
         return getLocalizedErrorMessage(stringProviderStore<InitStringProvider>())
     }
     abstract fun getLocalizedErrorMessage(stringProvider: InitStringProvider) : String
-}
-
-class DeviceIsRootedException : InitAppException("Device is rooted") {
-    override fun getLocalizedErrorMessage(stringProvider: InitStringProvider): String {
-        return stringProvider.deviceIsRootedMessage
-    }
 }
