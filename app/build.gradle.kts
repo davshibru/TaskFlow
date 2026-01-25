@@ -18,6 +18,8 @@ android {
 dependencies {
     implementation(projects.core.commonAndroid)
 
+    implementation(projects.features.init.presentation)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)

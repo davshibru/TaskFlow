@@ -6,39 +6,46 @@ import kotlinx.coroutines.flow.map
 sealed class Container<out T> {
 
 
-    abstract fun <R> fold(
+    public inline fun <R> fold(
         onSuccess: (T) -> R,
         onError: (Exception) -> R,
         onLoading: () -> R,
-    ): R
-
-    data object Loading : Container<Nothing>() {
-        override fun <R> fold(
-            onSuccess: (Nothing) -> R,
-            onError: (Exception) -> R,
-            onLoading: () -> R
-        ): R = onLoading()
+    ): R {
+        return when (this) {
+            is Success<T> -> onSuccess(value)
+            Loading -> onLoading()
+            is Error -> onError(exception)
+        }
     }
+
+    data object Loading : Container<Nothing>()
 
     data class Error(
         val exception: Exception
-    ) : Container<Nothing>() {
-        override fun <R> fold(
-            onSuccess: (Nothing) -> R,
-            onError: (Exception) -> R,
-            onLoading: () -> R
-        ): R = onError(exception)
-    }
+    ) : Container<Nothing>()
 
     data class Success<T>(
         val value: T,
-    ) : Container<T>() {
-        override fun <R> fold(
-            onSuccess: (T) -> R,
-            onError: (Exception) -> R,
-            onLoading: () -> R
-        ): R = onSuccess(value)
-    }
+    ) : Container<T>()
+}
+
+fun <T> successContainer(
+    value: T,
+): Container.Success<T> {
+    @Suppress("DEPRECATION")
+    return Container.Success(value)
+}
+
+fun loadingContainer(): Container.Loading {
+    @Suppress("DEPRECATION")
+    return Container.Loading
+}
+
+fun errorContainer(
+    exception: Exception,
+) : Container.Error {
+    @Suppress("DEPRECATION")
+    return Container.Error(exception)
 }
 
 fun <T, R> Container<T>.map(
@@ -67,7 +74,7 @@ fun <T, R> Container<T>.foldNullable(
     return fold(onSuccess, onError, onLoading)
 }
 
-fun <T> Container<T>.getExceptionOrNull() : Exception? {
+fun <T> Container<T>.getExceptionOrNull(): Exception? {
     return foldNullable(onError = { it })
 }
 

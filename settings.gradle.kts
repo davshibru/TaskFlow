@@ -25,6 +25,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "TaskFlow"
 include(":app")
+include(":core:theme")
 include(":core:essentials")
 include(":core:common-android")
 

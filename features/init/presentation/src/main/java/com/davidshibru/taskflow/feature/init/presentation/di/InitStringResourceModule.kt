@@ -2,7 +2,7 @@ package com.davidshibru.taskflow.feature.init.presentation.di
 
 import com.davidshibru.taskflow.core.essentials.resources.StringProvider
 import com.davidshibru.taskflow.feature.init.domain.resources.InitStringProvider
-import com.davidshibru.taskflow.feature.init.presentation.InitStringProviderImpl
+import com.davidshibru.taskflow.feature.init.presentation.resources.InitStringProviderImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

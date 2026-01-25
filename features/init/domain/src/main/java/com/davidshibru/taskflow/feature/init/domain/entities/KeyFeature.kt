@@ -1,4 +1,7 @@
 package com.davidshibru.taskflow.feature.init.domain.entities
 
- class KeyFeature {
-}
+data class KeyFeature(
+    val id: Long,
+    val title: String,
+    val description: String,
+)

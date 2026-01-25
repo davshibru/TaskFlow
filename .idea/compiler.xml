@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
-    <bytecodeTargetLevel target="11" />
+    <bytecodeTargetLevel target="11">
+      <module name="build-logic.conventions" target="17" />
+      <module name="build-logic.conventions.main" target="17" />
+      <module name="build-logic.conventions.test" target="17" />
+      <module name="TaskFlow.core.navigation" target="21" />
+      <module name="TaskFlow.feature.auth.api" target="21" />
+      <module name="TaskFlow.feature.auth.impl" target="21" />
+      <module name="TaskFlow.feature.splash.api" target="21" />
+      <module name="TaskFlow.feature.splash.impl" target="21" />
+    </bytecodeTargetLevel>
   </component>
 </project>
