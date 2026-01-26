@@ -11,7 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.davidshibru.taskflow.core.essentials.exceptions.mapper.ExceptionToMessageMapper
+import com.davidshibru.taskflow.core.common.android.AndroidExceptionHandler
 import com.davidshibru.taskflow.feature.init.presentation.InitScreen
 import com.davidshibru.taskflow.ui.theme.TaskFlowTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -21,7 +21,7 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
 
     @Inject
-    lateinit var exceptionTomMessageMapper: ExceptionToMessageMapper
+    lateinit var exceptionHandler: AndroidExceptionHandler
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,6 +31,7 @@ class MainActivity : ComponentActivity() {
             TaskFlowTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     App(modifier = Modifier.padding(innerPadding))
+                    exceptionHandler.ErrorDialog()
                 }
             }
         }

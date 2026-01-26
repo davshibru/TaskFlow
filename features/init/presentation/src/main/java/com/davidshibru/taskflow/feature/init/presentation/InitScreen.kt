@@ -11,6 +11,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -18,6 +19,7 @@ import com.davidshibru.taskflow.core.essentials.Container
 import com.davidshibru.taskflow.core.theme.Dimens
 import com.davidshibru.taskflow.core.theme.MediumVerticalSpace
 import com.davidshibru.taskflow.core.theme.components.ContainerView
+import com.davidshibru.taskflow.core.theme.components.ProgressButton
 import com.davidshibru.taskflow.feature.init.domain.entities.KeyFeature
 
 @Composable
@@ -28,16 +30,22 @@ fun InitScreen() {
         container = container,
         modifier = Modifier.fillMaxSize(),
     ) { state ->
-        InitContent(state)
+        InitContent(
+            state = state,
+            onLetsGoAction = viewModel::letsGo,
+        )
     }
 }
 
 @Composable
 fun InitContent(
     state: InitViewModel.State,
+    onLetsGoAction: () -> Unit,
 ) {
     Column(
-        modifier = Modifier.fillMaxSize().padding(Dimens.MediumPadding),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(Dimens.MediumPadding),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -55,6 +63,14 @@ fun InitContent(
             text = keyFeature.description,
             textAlign = TextAlign.Center,
         )
+
+        MediumVerticalSpace()
+
+        ProgressButton(
+            isInProgress = state.isCheckAuthInProgress,
+            text = stringResource(R.string.let_s_go),
+            onClick = onLetsGoAction
+        )
     }
 }
 
@@ -67,8 +83,9 @@ fun InitContentPreview() {
                 id = 1,
                 title = "This is a title",
                 description = "Tgds fgd gtt asdo kfodgk gpkth hgffop dfgje asdg vcxjf sdfafsdg gtgtgtl fdlgk",
-
-            )
-        )
+            ),
+            isCheckAuthInProgress = true,
+        ),
+        onLetsGoAction = {},
     )
 }

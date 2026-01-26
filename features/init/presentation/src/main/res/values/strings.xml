@@ -2,5 +2,6 @@
 <resources>
     
     <string name="rooted_device_error">Your device is rooted.</string>
-        
+    <string name="let_s_go">Let\'s Go</string>
+
 </resources>
