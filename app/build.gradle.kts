@@ -17,6 +17,7 @@ android {
 
 dependencies {
     implementation(projects.core.commonAndroid)
+    implementation(projects.navigation)
 
     implementation(projects.features.init.presentation)
 

@@ -21,8 +21,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class InitViewModel @Inject constructor(
-    private val getKeyFeatureUseCase: GetKeyFeatureUseCase,
+    getKeyFeatureUseCase: GetKeyFeatureUseCase,
     private val isAuthorizedUseCase: IsAuthorizedUseCase,
+    private val router: InitRouter,
     private val exceptionHandler: ExceptionHandler,
 ) : ViewModel() {
 
@@ -45,7 +46,7 @@ class InitViewModel @Inject constructor(
                 if (isAuthorized) {
                     // main flow
                 } else {
-                    // sign in flow
+                    router.launchSignInScreen()
                 }
             } catch (e: Exception) {
                 ensureActive()

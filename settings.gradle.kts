@@ -25,12 +25,16 @@ dependencyResolutionManagement {
 
 rootProject.name = "TaskFlow"
 include(":app")
+include(":navigation")
 include(":core:theme")
 include(":core:essentials")
 include(":core:common-android")
 
 include(":features:init:domain")
 include(":features:init:presentation")
+
+include(":features:sign-in:domain")
+include(":features:sign-in:presentation")
 
 include(":templates:android-library")
 include(":templates:kotlin-libraty")

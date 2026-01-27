@@ -14,10 +14,11 @@ ksp = "1.9.0-1.0.13"
 appcompat = "1.7.1"
 material = "1.13.0"
 timber = "5.0.1"
-navigiation = "2.9.0"
+navigation = "2.7.7"
 hilt-navigation = "1.2.0"
 coroutines = "1.9.0"
 container = "2.0.0-beta01"
+kotlinxSerialization = "1.6.3"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -35,10 +36,11 @@ androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-toolin
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigiation" }
+navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigation" }
 hilt-navigation = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hilt-navigation" }
 
 coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines"}
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 
 android-gradlePlugin = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
 kotlin-gradlePlugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -60,10 +62,10 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 
 convention-android-application = { id = "com.davidshibru.convention.android.application" }
 convention-android-library = { id = "com.davidshibru.convention.android.library" }
 convention-kotlin-library = { id = "com.davidshibru.convention.kotlin.library" }
 convention-compose = { id = "com.davidshibru.convention.compose" }
 convention-hilt = { id = "com.davidshibru.convention.hilt" }
-
