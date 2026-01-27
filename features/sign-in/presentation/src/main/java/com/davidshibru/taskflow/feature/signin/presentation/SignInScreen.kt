@@ -14,20 +14,27 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.davidshibru.taskflow.core.essentials.Container
+import com.davidshibru.taskflow.core.navigation.dsl.ScreenScope
+import com.davidshibru.taskflow.core.navigation.dsl.ScreenToolbar
 import com.davidshibru.taskflow.core.theme.components.ContainerView
 
-@Composable
-fun SignInScreen() {
-    val viewModel: SignInViewModel = hiltViewModel()
-    val container: Container<SignInViewModel.State> by viewModel.stateFlow.collectAsState()
-    ContainerView(
-        container = container,
-        modifier = Modifier.fillMaxSize(),
-    ) { state ->
-        Box(modifier = Modifier.fillMaxSize()) {
-            SignInContent(
-                state = state,
-            )
+
+fun ScreenScope.signInScreen() {
+    toolbar = ScreenToolbar.Default(
+        title = context.getString(R.string.sign_in),
+    )
+    content {
+        val viewModel: SignInViewModel = hiltViewModel()
+        val container: Container<SignInViewModel.State> by viewModel.stateFlow.collectAsState()
+        ContainerView(
+            container = container,
+            modifier = Modifier.fillMaxSize(),
+        ) { state ->
+            Box(modifier = Modifier.fillMaxSize()) {
+                SignInContent(
+                    state = state,
+                )
+            }
         }
     }
 }

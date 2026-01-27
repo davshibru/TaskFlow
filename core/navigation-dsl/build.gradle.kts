@@ -1,19 +1,13 @@
 plugins {
     alias(libs.plugins.convention.android.library)
     alias(libs.plugins.convention.compose)
-    alias(libs.plugins.convention.hilt)
 }
 
 android {
-    namespace = "com.davidshibru.taskflow.feature.init.presentation"
+    namespace = "com.davidshibru.taskflow.core.navigation.dsl"
 }
 
 dependencies {
-    api(projects.features.init.domain)
-    implementation(projects.core.essentials)
-    implementation(projects.core.theme)
-    implementation(projects.core.navigationDsl)
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
@@ -21,18 +15,10 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
-//    implementation(libs.container)
-
     // ===== compose =====
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
-
-    implementation(libs.navigation.compose)
-    implementation(libs.hilt.navigation)
-
 }

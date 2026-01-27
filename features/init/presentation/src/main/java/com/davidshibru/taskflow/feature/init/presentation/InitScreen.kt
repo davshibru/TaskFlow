@@ -16,24 +16,29 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.davidshibru.taskflow.core.essentials.Container
+import com.davidshibru.taskflow.core.navigation.dsl.ScreenScope
+import com.davidshibru.taskflow.core.navigation.dsl.ScreenToolbar
 import com.davidshibru.taskflow.core.theme.Dimens
 import com.davidshibru.taskflow.core.theme.MediumVerticalSpace
 import com.davidshibru.taskflow.core.theme.components.ContainerView
 import com.davidshibru.taskflow.core.theme.components.ProgressButton
 import com.davidshibru.taskflow.feature.init.domain.entities.KeyFeature
 
-@Composable
-fun InitScreen() {
-    val viewModel: InitViewModel = hiltViewModel()
-    val container: Container<InitViewModel.State> by viewModel.stateFlow.collectAsState()
-    ContainerView(
-        container = container,
-        modifier = Modifier.fillMaxSize(),
-    ) { state ->
-        InitContent(
-            state = state,
-            onLetsGoAction = viewModel::letsGo,
-        )
+
+fun ScreenScope.initScreen() {
+    toolbar = ScreenToolbar.Hidden
+    content {
+        val viewModel: InitViewModel = hiltViewModel()
+        val container: Container<InitViewModel.State> by viewModel.stateFlow.collectAsState()
+        ContainerView(
+            container = container,
+            modifier = Modifier.fillMaxSize(),
+        ) { state ->
+            InitContent(
+                state = state,
+                onLetsGoAction = viewModel::letsGo,
+            )
+        }
     }
 }
 

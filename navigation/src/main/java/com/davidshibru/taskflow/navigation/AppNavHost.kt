@@ -14,6 +14,8 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.createGraph
+import com.davidshibru.taskflow.navigation.base.ExtendedNavGraphBuilder
+import com.davidshibru.taskflow.navigation.base.ExtendedNavGraphBuilderImpl
 import com.davidshibru.taskflow.navigation.base.NavComponentAppRouter
 import kotlinx.coroutines.awaitCancellation
 
@@ -21,13 +23,15 @@ import kotlinx.coroutines.awaitCancellation
 fun AppNavHost(
     modifier: Modifier,
     startDestination: Routes = InitRoute,
-    navGraphBuilder: NavGraphBuilder.() -> Unit = {},
+    navGraphBuilder: ExtendedNavGraphBuilder.() -> Unit = {},
 ) {
     val navController = rememberNavController()
     val navGraph = remember {
         navController.createGraph(startDestination.feature) {
-            buildAppNavGraph()
-            navGraphBuilder()
+            with(ExtendedNavGraphBuilderImpl(this)) {
+                buildAppNavGraph()
+                navGraphBuilder()
+            }
         }
     }
     val appRouter = NavComponentAppRouter.VM.get()

@@ -29,6 +29,7 @@ include(":navigation")
 include(":core:theme")
 include(":core:essentials")
 include(":core:common-android")
+include(":core:navigation-dsl")
 
 include(":features:init:domain")
 include(":features:init:presentation")

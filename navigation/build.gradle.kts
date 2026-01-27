@@ -13,6 +13,8 @@ dependencies {
     implementation(projects.features.init.presentation)
     implementation(projects.features.signIn.presentation)
 
+    implementation(projects.core.navigationDsl)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
