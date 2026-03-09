@@ -22,4 +22,7 @@ dependencyResolutionManagement {
 
 rootProject.name = "TaskFlow"
 include(":app")
+include(":template:script")
+
 include(":template:android-library")
+include(":template:kotlin-library")

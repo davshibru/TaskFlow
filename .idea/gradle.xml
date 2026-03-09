@@ -27,6 +27,8 @@
             <option value="$PROJECT_DIR$/build-logic/convention" />
             <option value="$PROJECT_DIR$/template" />
             <option value="$PROJECT_DIR$/template/android-library" />
+            <option value="$PROJECT_DIR$/template/kotlin-library" />
+            <option value="$PROJECT_DIR$/template/script" />
           </set>
         </option>
       </GradleProjectSettings>
