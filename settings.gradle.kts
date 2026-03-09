@@ -26,3 +26,5 @@ include(":template:script")
 
 include(":template:android-library")
 include(":template:kotlin-library")
+
+include(":core:essentials")
