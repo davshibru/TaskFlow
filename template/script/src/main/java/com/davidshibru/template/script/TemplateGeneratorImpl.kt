@@ -5,20 +5,19 @@ import java.io.File
 class TemplateGeneratorImpl {
     fun generate(args: InputArgs) {
         val basePath = args.moduleName.replace(":", "/").removePrefix("/")
-
-        val featureName =
-            args.moduleName.substringAfterLast(":").replaceFirstChar { it.uppercase() }
+        // Извлекаем имя для класса (например, из ":core:network" -> "Network")
+        val simpleName = args.moduleName.substringAfterLast(":").replaceFirstChar { it.uppercase() }
 
         when (args.templateName) {
-            "feature" -> generateFeatureModule(basePath, featureName, args)
-            "kotlin-library" -> generateKotlinLibrary(basePath, args, emptyList())
-            "android-library" -> generateAndroidLibrary(basePath, args, emptyList())
-            else -> println("❌ Неизвестный шаблон: ${args.templateName}")
+            "feature" -> generateFeatureModule(basePath, simpleName, args)
+            // Теперь передаем simpleName в обычную библиотеку
+            "kotlin-library" -> generateKotlinLibrary(basePath, simpleName, args)
+            "android-library" -> generateAndroidLibrary(basePath, args)
+            else -> println("❌ Unknown template: ${args.templateName}")
         }
     }
 
-    private fun generateFeatureModule(basePath: String, featureName: String, args: InputArgs) {
-        println("🚀 Создаем фича-модуль: $featureName...")
+    private fun generateFeatureModule(basePath: String, featureName: String, args: InputArgs) {println("🚀 Creating feature module: $featureName...")
 
         val domainModuleName = "${args.moduleName}:domain"
         val domainPackageName = "${args.packageName}.domain"
@@ -29,7 +28,8 @@ class TemplateGeneratorImpl {
             packageName = domainPackageName,
             features = args.features.filter { it != "--hilt" && it != "--compose" }
         )
-        generateKotlinLibrary("$basePath/domain", domainArgs)
+
+        generateKotlinLibrary("$basePath/domain", "${featureName}UseCase", domainArgs)
 
         val useCaseContent = """
             package $domainPackageName
@@ -90,9 +90,17 @@ class TemplateGeneratorImpl {
             "implementation(libs.material)",
             "testImplementation(libs.junit)",
             "androidTestImplementation(libs.androidx.junit)",
+            "androidTestImplementation(libs.androidx.espresso.core)",
+
+            "testImplementation(libs.junit)",
+            "androidTestImplementation(libs.androidx.junit)",
             "androidTestImplementation(libs.androidx.espresso.core)"
         )
 
+        if (args.features.contains("--coroutines")) {
+            baseDependencies.add("implementation(libs.kotlinx.coroutines.android)")
+            baseDependencies.add("testImplementation(libs.kotlinx.coroutines.test)")
+        }
         // Сливаем базовые и переданные (например, зависимость от domain)
         val allDependencies = baseDependencies + extraDependencies
 
@@ -112,44 +120,72 @@ class TemplateGeneratorImpl {
 
         writeFile("$path/build.gradle.kts", buildGradleContent)
 
+        generateGitIgnore(path)
+        generateProguardRules(path)
+        generateConsumerRules(path)
+
         val manifestContent = """<?xml version="1.0" encoding="utf-8"?><manifest />"""
         writeFile("$path/src/main/AndroidManifest.xml", manifestContent)
 
         appendToSettings(args.moduleName)
-        println("✅ Создан Android модуль в $path")
+        println("✅ Created Android module at: $path")
+
+        addToGitIfRequested(path, args)
     }
 
     private fun generateKotlinLibrary(
         path: String,
+        className: String,
         args: InputArgs,
         extraDependencies: List<String> = emptyList()
     ) {
-        val depsBlock = if (extraDependencies.isNotEmpty()) {
-            "\ndependencies {\n    ${extraDependencies.joinToString("\n    ")}\n}"
-        } else ""
+        val baseDeps = mutableListOf(
+            "testImplementation(libs.junit)"
+        )
+        val allDeps = baseDeps + extraDependencies
+
+        val depsContent = allDeps.joinToString("\n    ")
 
         val buildGradleContent = """
-        plugins {
-            id("java-library")
-            alias(libs.plugins.jetbrains.kotlin.jvm)
-        }
-        
-        java {
-            sourceCompatibility = JavaVersion.VERSION_11
-            targetCompatibility = JavaVersion.VERSION_11
-        }
-        
-        kotlin {
-            compilerOptions {
-                jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11
+            plugins {
+                id("java-library")
+                alias(libs.plugins.jetbrains.kotlin.jvm)
             }
-        }
-        $depsBlock
-    """.trimIndent()
+            
+            java {
+                sourceCompatibility = JavaVersion.VERSION_11
+                targetCompatibility = JavaVersion.VERSION_11
+            }
+            
+            kotlin {
+                compilerOptions {
+                    jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11
+                }
+            }
+            dependencies {
+                $depsContent
+            }
+        """.trimIndent()
 
         writeFile("$path/build.gradle.kts", buildGradleContent)
+
+        // --- ГЕНЕРАЦИЯ КЛАССА ---
+        val classContent = """
+            package ${args.packageName}
+            
+            class $className {
+                // TODO: Implement logic for $className
+            }
+        """.trimIndent()
+
+        generateGitIgnore(path)
+
+        writeSourceFile(path, args.packageName, "$className.kt", classContent)
+
         appendToSettings(args.moduleName)
-        println("✅ Создан Kotlin модуль в $path")
+        println("✅ Created Kotlin module with class $className at: $path")
+
+        addToGitIfRequested(path, args)
     }
 
     private fun writeSourceFile(
@@ -161,7 +197,7 @@ class TemplateGeneratorImpl {
         val packagePath = packageName.replace(".", "/")
         val fullPath = "$basePath/src/main/java/$packagePath/$fileName"
         writeFile(fullPath, content)
-        println("   📝 Сгенерирован файл: $fileName")
+        println("   📝 Generated file: $fileName")
     }
 
     private fun writeFile(path: String, content: String) {
@@ -171,7 +207,6 @@ class TemplateGeneratorImpl {
     }
 
     private fun appendToSettings(moduleName: String) {
-        // Предполагается, что скрипт запускается из корня проекта
         val settingsFile = File("settings.gradle.kts")
         val includeStatement = "include(\"$moduleName\")"
 
@@ -179,10 +214,49 @@ class TemplateGeneratorImpl {
             val currentContent = settingsFile.readText()
             if (!currentContent.contains(includeStatement)) {
                 settingsFile.appendText("\n$includeStatement")
-                println("   ⚙️ Добавлено в settings.gradle.kts: $includeStatement")
+                println("   ⚙️ Added to settings.gradle.kts: $includeStatement")
             }
         } else {
-            println("⚠️ Файл settings.gradle.kts не найден в корне проекта!")
+            println("⚠️ Error: settings.gradle.kts not found!")
+        }
+    }
+
+    private fun generateGitIgnore(path: String) {
+        val content = "/build"
+        writeFile("$path/.gitignore", content)
+        println("   📝 Generated file: .gitignore")
+    }
+
+    private fun generateProguardRules(path: String) {
+        val content = """
+            # Add project specific ProGuard rules here.
+            # By default, the flags in this file are appended to flags specified
+            # in ${'$'}ANDROID_HOME/tools/proguard/proguard-android.txt
+            # You can edit the include path and order by changing the consumerProguardFiles
+            # directive in build.gradle.kts.
+        """.trimIndent()
+        writeFile("$path/proguard-rules.pro", content)
+        println("   📝 Generated file: proguard-rules.pro")
+    }
+
+
+    private fun generateConsumerRules(path: String) {
+        writeFile("$path/consumer-rules.pro", "# Rules for library consumers.")
+        println("   📝 Generated file: consumer-rules.pro")
+    }
+
+    private fun addToGitIfRequested(path: String, args: InputArgs) {
+        // Проверяем, передал ли юзер флаг --git
+        if (args.features.contains("--git")) {
+            try {
+                val process = ProcessBuilder("git", "add", path)
+                    .directory(File("."))
+                    .start()
+                process.waitFor()
+                println("   🌿 Added to Git: $path")
+            } catch (e: Exception) {
+                println("   ⚠️ Failed to add to Git: ${e.message}")
+            }
         }
     }
 }
