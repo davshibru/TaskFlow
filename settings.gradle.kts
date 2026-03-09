@@ -22,4 +22,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "TaskFlow"
 include(":app")
- 
+include(":template:android-library")

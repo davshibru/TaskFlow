@@ -14,9 +14,8 @@ class ComposeConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) = with(target) {
         println("*** ComposeConventionPlugin invoke***")
 
-        with(pluginManager) {
-            apply("org.jetbrains.kotlin.plugin.compose")
-        }
+//        with(pluginManager) {
+//        }
 
         pluginManager.withPlugin("com.android.application") {
             extensions.configure<ApplicationExtension> {

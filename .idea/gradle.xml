@@ -25,6 +25,8 @@
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/build-logic" />
             <option value="$PROJECT_DIR$/build-logic/convention" />
+            <option value="$PROJECT_DIR$/template" />
+            <option value="$PROJECT_DIR$/template/android-library" />
           </set>
         </option>
       </GradleProjectSettings>

@@ -1,38 +1,32 @@
 package com.davidshibru.convention
 
-import com.android.build.api.dsl.ApplicationExtension
+import com.android.build.api.dsl.LibraryExtension
 import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 
-class AndroidApplicationConventionPlugin : Plugin<Project> {
+class AndroidLibraryConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) = with(target) {
-        println("*** AndroidApplicationConventionPlugin invoke ***")
-
         with(pluginManager) {
-            apply("com.android.application")
-            apply("org.jetbrains.kotlin.plugin.compose")
+            apply("com.android.library")
         }
 
-        extensions.configure<ApplicationExtension> {
-            configureAndroidApplication(this)
+        extensions.configure<LibraryExtension> {
+            configureAndroidLibrary(this)
         }
     }
 }
 
-private fun Project.configureAndroidApplication(applicationExtension: ApplicationExtension) {
-    applicationExtension.apply {
+private fun Project.configureAndroidLibrary(libraryExtension: LibraryExtension) {
+    libraryExtension.apply {
         compileSdk = Const.TargetSdk
 
         defaultConfig {
             minSdk = Const.MinSdk
-            targetSdk = Const.TargetSdk
 
             testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-            vectorDrawables {
-                useSupportLibrary = true
-            }
+            consumerProguardFiles("consumer-rules.pro")
         }
 
         buildTypes {
@@ -48,12 +42,6 @@ private fun Project.configureAndroidApplication(applicationExtension: Applicatio
         compileOptions {
             sourceCompatibility = JavaVersion.VERSION_17
             targetCompatibility = JavaVersion.VERSION_17
-        }
-
-        packaging {
-            resources {
-                excludes += "/META-INF/{AL2.0,LGPL2.1}"
-            }
         }
     }
 }
