@@ -5,19 +5,12 @@ import java.io.File
 class TemplateGeneratorImpl {
     fun generate(args: InputArgs) {
         val basePath = args.moduleName.replace(":", "/").removePrefix("/")
-
         val simpleName = getClassName(args)
 
         when (args.templateName) {
             "feature" -> generateFeatureModule(basePath, simpleName, args)
-            // Теперь передаем simpleName в обычную библиотеку
             "kotlin-library" -> generateKotlinLibrary(basePath, simpleName, args)
-            "android-library" -> generateAndroidLibrary(
-                path = basePath,
-                className = simpleName,
-                args = args
-            )
-
+            "android-library" -> generateAndroidLibrary(basePath, simpleName, args)
             else -> println("❌ Unknown template: ${args.templateName}")
         }
     }
@@ -25,10 +18,9 @@ class TemplateGeneratorImpl {
     private fun generateFeatureModule(basePath: String, featureName: String, args: InputArgs) {
         println("🚀 Creating feature module: $featureName...")
 
+        // --- 1. Создаем Domain ---
         val domainModuleName = "${args.moduleName}:domain"
         val domainPackageName = "${args.packageName}.domain"
-
-        // --- 1. Создаем Domain ---
         val domainArgs = args.copy(
             moduleName = domainModuleName,
             packageName = domainPackageName,
@@ -36,57 +28,31 @@ class TemplateGeneratorImpl {
         )
 
         generateKotlinLibrary("$basePath/domain", "${featureName}UseCase", domainArgs)
-
-        val useCaseContent = """
-            package $domainPackageName
-            
-            interface ${featureName}UseCase {
-                operator fun invoke()
-            }
-        """.trimIndent()
-        writeSourceFile(
-            "$basePath/domain",
-            domainPackageName,
-            "${featureName}UseCase.kt",
-            useCaseContent
+        ProjectUtils.writeSourceFile(
+            "$basePath/domain", domainPackageName, "${featureName}UseCase.kt",
+            CodeTemplates.useCaseInterface(domainPackageName, featureName)
         )
 
-        val presentationModuleName = "${args.moduleName}:presentation"
-        val presentationPackageName = "${args.packageName}.presentation"
-
+        // --- 2. Создаем Presentation ---
         val presentationArgs = args.copy(
-            moduleName = presentationModuleName,
-            packageName = presentationPackageName
-        )
-        // Указываем зависимость от domain-модуля
-        val predefinedDependencies = listOf(
-            "implementation(project(\"$domainModuleName\"))",
+            moduleName = "${args.moduleName}:presentation",
+            packageName = "${args.packageName}.presentation"
         )
 
-        val projectDependencies = listOf(
-            "androidTestImplementation(libs.androidx.junit)",
-            "androidTestImplementation(libs.androidx.espresso.core)",
-        )
         generateAndroidLibrary(
             path = "$basePath/presentation",
+            className = null,
             args = presentationArgs,
-            predefinedDependencies = predefinedDependencies,
-            extraDependencies = projectDependencies
+            predefinedDependencies = listOf("implementation(project(\"$domainModuleName\"))"),
+            extraDependencies = listOf(
+                "androidTestImplementation(libs.androidx.junit)",
+                "androidTestImplementation(libs.androidx.espresso.core)"
+            )
         )
 
-        // Генерируем Router интерфейс
-        val routerContent = """
-            package $presentationPackageName
-            
-            interface ${featureName}Router {
-                fun navigateBack()
-            }
-        """.trimIndent()
-        writeSourceFile(
-            "$basePath/presentation",
-            presentationPackageName,
-            "${featureName}Router.kt",
-            routerContent
+        ProjectUtils.writeSourceFile(
+            "$basePath/presentation", presentationArgs.packageName, "${featureName}Router.kt",
+            CodeTemplates.routerInterface(presentationArgs.packageName, featureName)
         )
     }
 
@@ -97,73 +63,49 @@ class TemplateGeneratorImpl {
         predefinedDependencies: List<String> = emptyList(),
         extraDependencies: List<String> = emptyList()
     ) {
+        ProjectUtils.ensureParentBuildFilesExist(path, args)
         val plugins = mutableListOf("alias(libs.plugins.convention.android.library)")
 
-        // Добавляем дополнительные плагины по флагам
         if (args.features.contains("--compose")) plugins.add("alias(libs.plugins.convention.compose)")
         if (args.features.contains("--hilt")) plugins.add("alias(libs.plugins.convention.hilt)")
 
-        // Базовые зависимости для Android Library
-        val baseDependencies = mutableListOf(
+        val baseDeps = mutableListOf(
             "implementation(libs.androidx.core.ktx)",
             "implementation(libs.androidx.appcompat)",
             "implementation(libs.material)",
-
-            "testImplementation(libs.junit)",
+            "testImplementation(libs.junit)"
         )
-
         if (args.features.contains("--coroutines")) {
-            baseDependencies.add("implementation(libs.kotlinx.coroutines.android)")
-            baseDependencies.add("testImplementation(libs.kotlinx.coroutines.test)")
+            baseDeps.add("implementation(libs.kotlinx.coroutines.android)")
+            baseDeps.add("testImplementation(libs.kotlinx.coroutines.test)")
         }
-        // Сливаем базовые и переданные (например, зависимость от domain)
-        val allDependencies = predefinedDependencies + baseDependencies + extraDependencies
 
-        val buildGradleContent = """
-        plugins {
-            ${plugins.joinToString("\n            ")}
-        }
-        
-        android {
-            namespace = "${args.packageName}"
-        }
-        
-        dependencies {
-            ${allDependencies.joinToString("\n            ")}
-        }
-    """.trimIndent()
+        val allDeps = predefinedDependencies + baseDeps + extraDependencies
+
+        val buildGradle = """
+            plugins {
+                ${plugins.joinToString("\n                ")}
+            }
+            android {
+                namespace = "${args.packageName}"
+            }
+            dependencies {
+                ${allDeps.joinToString("\n                ")}
+            }
+        """.trimIndent()
+
+        ProjectUtils.writeFile("$path/build.gradle.kts", buildGradle)
 
         if (className != null) {
-            // --- ГЕНЕРАЦИЯ КЛАССА ---
-            val classContent = """
-            package ${args.packageName}
-            
-            import android.content.Context
-            import android.widget.Toast
-            
-            class $className {
-                fun hello(context: Context) {
-                    Toast.makeText(context, "Hello from ${className}!", Toast.LENGTH_SHORT).show()
-                }
-            }
-            """.trimIndent()
-
-            writeSourceFile(path, args.packageName, "$className.kt", classContent)
+            ProjectUtils.writeSourceFile(path, args.packageName, "$className.kt", CodeTemplates.androidClass(args.packageName, className))
         }
 
-        writeFile("$path/build.gradle.kts", buildGradleContent)
+        generateStandardFiles(path)
 
-        generateGitIgnore(path)
-        generateProguardRules(path)
-        generateConsumerRules(path)
+        val defaultClassName = className ?: path.substringAfterLast("/").replaceFirstChar { it.uppercase() }
+        generateUnitTestFile(path, args.packageName, defaultClassName, args)
 
-        val manifestContent = """<?xml version="1.0" encoding="utf-8"?><manifest />"""
-        writeFile("$path/src/main/AndroidManifest.xml", manifestContent)
-
-        appendToSettings(args.moduleName)
-        println("✅ Created Android module at: $path")
-
-        addToGitIfRequested(path, args)
+        finishModuleGeneration(path, args)
     }
 
     private fun generateKotlinLibrary(
@@ -172,132 +114,65 @@ class TemplateGeneratorImpl {
         args: InputArgs,
         extraDependencies: List<String> = emptyList()
     ) {
-        val baseDeps = mutableListOf(
-            "testImplementation(libs.junit)"
-        )
-        val allDeps = baseDeps + extraDependencies
+        ProjectUtils.ensureParentBuildFilesExist(path, args)
 
+        val allDeps = listOf("testImplementation(libs.junit)") + extraDependencies
         val depsContent = allDeps.joinToString("\n    ")
 
-        val buildGradleContent = """
+        val buildGradle = """
             plugins {
                 id("java-library")
                 alias(libs.plugins.jetbrains.kotlin.jvm)
             }
-            
             java {
                 sourceCompatibility = JavaVersion.VERSION_11
                 targetCompatibility = JavaVersion.VERSION_11
             }
-            
             kotlin {
-                compilerOptions {
-                    jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11
-                }
+                compilerOptions { jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11 }
             }
             dependencies {
                 $depsContent
             }
         """.trimIndent()
 
-        writeFile("$path/build.gradle.kts", buildGradleContent)
+        ProjectUtils.writeFile("$path/build.gradle.kts", buildGradle)
+        ProjectUtils.writeSourceFile(path, args.packageName, "$className.kt", CodeTemplates.kotlinClass(args.packageName, className))
 
-        // --- ГЕНЕРАЦИЯ КЛАССА ---
-        val classContent = """
-            package ${args.packageName}
-            
-            class $className {
-                // TODO: Implement logic for $className
-            }
-        """.trimIndent()
+        ProjectUtils.writeFile("$path/.gitignore", "/build")
+        generateUnitTestFile(path, args.packageName, className, args)
 
-        generateGitIgnore(path)
-
-        writeSourceFile(path, args.packageName, "$className.kt", classContent)
-
-        appendToSettings(args.moduleName)
-        println("✅ Created Kotlin module with class $className at: $path")
-
-        addToGitIfRequested(path, args)
+        finishModuleGeneration(path, args)
     }
 
-    private fun writeSourceFile(
-        basePath: String,
-        packageName: String,
-        fileName: String,
-        content: String
-    ) {
-        val packagePath = packageName.replace(".", "/")
-        val fullPath = "$basePath/src/main/java/$packagePath/$fileName"
-        writeFile(fullPath, content)
-        println("   📝 Generated file: $fileName")
+    // --- Общие хелперы для генератора ---
+
+    private fun generateStandardFiles(path: String) {
+        ProjectUtils.writeFile("$path/.gitignore", "/build")
+        ProjectUtils.writeFile("$path/proguard-rules.pro", CodeTemplates.proguardRules())
+        ProjectUtils.writeFile("$path/consumer-rules.pro", "# Rules for library consumers.")
+        ProjectUtils.writeFile("$path/src/main/AndroidManifest.xml", """<?xml version="1.0" encoding="utf-8"?><manifest />""")
     }
 
-    private fun writeFile(path: String, content: String) {
-        val file = File(path)
-        file.parentFile?.mkdirs()
-        file.writeText(content)
+    private fun generateUnitTestFile(path: String, packageName: String, className: String, args: InputArgs) {
+        val testDirPath = "$path/src/test/java/${packageName.replace('.', '/')}"
+        File(testDirPath).mkdirs()
+        val fileName = "${className}Test.kt"
+
+        ProjectUtils.writeFile("$testDirPath/$fileName", CodeTemplates.unitTest(packageName, className))
+        println("   🧪 Created Test file: $fileName")
+        ProjectUtils.addToGitIfRequested(testDirPath, args)
     }
 
-    private fun appendToSettings(moduleName: String) {
-        val settingsFile = File("settings.gradle.kts")
-        val includeStatement = "include(\"$moduleName\")"
-
-        if (settingsFile.exists()) {
-            val currentContent = settingsFile.readText()
-            if (!currentContent.contains(includeStatement)) {
-                settingsFile.appendText("\n$includeStatement")
-                println("   ⚙️ Added to settings.gradle.kts: $includeStatement")
-            }
-        } else {
-            println("⚠️ Error: settings.gradle.kts not found!")
-        }
-    }
-
-    private fun generateGitIgnore(path: String) {
-        val content = "/build"
-        writeFile("$path/.gitignore", content)
-        println("   📝 Generated file: .gitignore")
-    }
-
-    private fun generateProguardRules(path: String) {
-        val content = """
-            # Add project specific ProGuard rules here.
-            # By default, the flags in this file are appended to flags specified
-            # in ${'$'}ANDROID_HOME/tools/proguard/proguard-android.txt
-            # You can edit the include path and order by changing the consumerProguardFiles
-            # directive in build.gradle.kts.
-        """.trimIndent()
-        writeFile("$path/proguard-rules.pro", content)
-        println("   📝 Generated file: proguard-rules.pro")
-    }
-
-
-    private fun generateConsumerRules(path: String) {
-        writeFile("$path/consumer-rules.pro", "# Rules for library consumers.")
-        println("   📝 Generated file: consumer-rules.pro")
-    }
-
-    private fun addToGitIfRequested(path: String, args: InputArgs) {
-        // Проверяем, передал ли юзер флаг --git
-        if (args.features.contains("--git")) {
-            try {
-                val process = ProcessBuilder("git", "add", path)
-                    .directory(File("."))
-                    .start()
-                process.waitFor()
-                println("   🌿 Added to Git: $path")
-            } catch (e: Exception) {
-                println("   ⚠️ Failed to add to Git: ${e.message}")
-            }
-        }
+    private fun finishModuleGeneration(path: String, args: InputArgs) {
+        ProjectUtils.appendToSettings(args.moduleName)
+        ProjectUtils.addToGitIfRequested(path, args)
+        println("✅ Finished generating module at: $path")
     }
 
     private fun getClassName(args: InputArgs): String {
-        val rawName = args.moduleName.substringAfterLast(":")
-
-        return rawName.split("-", "_").joinToString("") { part ->
-            part.replaceFirstChar { it.uppercase() }
+        return args.moduleName.substringAfterLast(":").split("-", "_").joinToString("") {
+            it.replaceFirstChar { char -> char.uppercase() }
         }
     }
 }
