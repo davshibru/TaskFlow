@@ -1,4 +1,4 @@
-package com.davidshibru.taskflow.core.essentials
+package com.davidshibru.taskflow.core.essentials.exception
 
 abstract class AppException (
     message: String,
