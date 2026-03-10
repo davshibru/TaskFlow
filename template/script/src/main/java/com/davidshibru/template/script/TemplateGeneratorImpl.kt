@@ -5,19 +5,25 @@ import java.io.File
 class TemplateGeneratorImpl {
     fun generate(args: InputArgs) {
         val basePath = args.moduleName.replace(":", "/").removePrefix("/")
-        // Извлекаем имя для класса (например, из ":core:network" -> "Network")
-        val simpleName = args.moduleName.substringAfterLast(":").replaceFirstChar { it.uppercase() }
+
+        val simpleName = getClassName(args)
 
         when (args.templateName) {
             "feature" -> generateFeatureModule(basePath, simpleName, args)
             // Теперь передаем simpleName в обычную библиотеку
             "kotlin-library" -> generateKotlinLibrary(basePath, simpleName, args)
-            "android-library" -> generateAndroidLibrary(basePath, args)
+            "android-library" -> generateAndroidLibrary(
+                path = basePath,
+                className = simpleName,
+                args = args
+            )
+
             else -> println("❌ Unknown template: ${args.templateName}")
         }
     }
 
-    private fun generateFeatureModule(basePath: String, featureName: String, args: InputArgs) {println("🚀 Creating feature module: $featureName...")
+    private fun generateFeatureModule(basePath: String, featureName: String, args: InputArgs) {
+        println("🚀 Creating feature module: $featureName...")
 
         val domainModuleName = "${args.moduleName}:domain"
         val domainPackageName = "${args.packageName}.domain"
@@ -53,8 +59,20 @@ class TemplateGeneratorImpl {
             packageName = presentationPackageName
         )
         // Указываем зависимость от domain-модуля
-        val projectDependencies = listOf("implementation(project(\"$domainModuleName\"))")
-        generateAndroidLibrary("$basePath/presentation", presentationArgs, projectDependencies)
+        val predefinedDependencies = listOf(
+            "implementation(project(\"$domainModuleName\"))",
+        )
+
+        val projectDependencies = listOf(
+            "androidTestImplementation(libs.androidx.junit)",
+            "androidTestImplementation(libs.androidx.espresso.core)",
+        )
+        generateAndroidLibrary(
+            path = "$basePath/presentation",
+            args = presentationArgs,
+            predefinedDependencies = predefinedDependencies,
+            extraDependencies = projectDependencies
+        )
 
         // Генерируем Router интерфейс
         val routerContent = """
@@ -74,7 +92,9 @@ class TemplateGeneratorImpl {
 
     private fun generateAndroidLibrary(
         path: String,
+        className: String? = null,
         args: InputArgs,
+        predefinedDependencies: List<String> = emptyList(),
         extraDependencies: List<String> = emptyList()
     ) {
         val plugins = mutableListOf("alias(libs.plugins.convention.android.library)")
@@ -88,13 +108,8 @@ class TemplateGeneratorImpl {
             "implementation(libs.androidx.core.ktx)",
             "implementation(libs.androidx.appcompat)",
             "implementation(libs.material)",
-            "testImplementation(libs.junit)",
-            "androidTestImplementation(libs.androidx.junit)",
-            "androidTestImplementation(libs.androidx.espresso.core)",
 
             "testImplementation(libs.junit)",
-            "androidTestImplementation(libs.androidx.junit)",
-            "androidTestImplementation(libs.androidx.espresso.core)"
         )
 
         if (args.features.contains("--coroutines")) {
@@ -102,7 +117,7 @@ class TemplateGeneratorImpl {
             baseDependencies.add("testImplementation(libs.kotlinx.coroutines.test)")
         }
         // Сливаем базовые и переданные (например, зависимость от domain)
-        val allDependencies = baseDependencies + extraDependencies
+        val allDependencies = predefinedDependencies + baseDependencies + extraDependencies
 
         val buildGradleContent = """
         plugins {
@@ -117,6 +132,24 @@ class TemplateGeneratorImpl {
             ${allDependencies.joinToString("\n            ")}
         }
     """.trimIndent()
+
+        if (className != null) {
+            // --- ГЕНЕРАЦИЯ КЛАССА ---
+            val classContent = """
+            package ${args.packageName}
+            
+            import android.content.Context
+            import android.widget.Toast
+            
+            class $className {
+                fun hello(context: Context) {
+                    Toast.makeText(context, "Hello from ${className}!", Toast.LENGTH_SHORT).show()
+                }
+            }
+            """.trimIndent()
+
+            writeSourceFile(path, args.packageName, "$className.kt", classContent)
+        }
 
         writeFile("$path/build.gradle.kts", buildGradleContent)
 
@@ -257,6 +290,14 @@ class TemplateGeneratorImpl {
             } catch (e: Exception) {
                 println("   ⚠️ Failed to add to Git: ${e.message}")
             }
+        }
+    }
+
+    private fun getClassName(args: InputArgs): String {
+        val rawName = args.moduleName.substringAfterLast(":")
+
+        return rawName.split("-", "_").joinToString("") { part ->
+            part.replaceFirstChar { it.uppercase() }
         }
     }
 }

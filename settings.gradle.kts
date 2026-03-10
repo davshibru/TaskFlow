@@ -20,6 +20,8 @@ dependencyResolutionManagement {
     }
 }
 
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
 rootProject.name = "TaskFlow"
 include(":app")
 include(":template:script")
@@ -28,3 +30,4 @@ include(":template:android-library")
 include(":template:kotlin-library")
 
 include(":core:essentials")
+include(":core:common-android")

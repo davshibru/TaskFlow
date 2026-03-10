@@ -1,7 +1,8 @@
 package com.davidshibru.taskflow
 
-import android.app.Application
+
+import com.davidshibru.taskflow.core.common.android.AbstractApplication
 import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
-class TaskFlowApp : Application()
+class TaskFlowApp : AbstractApplication()
