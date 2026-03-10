@@ -6,13 +6,14 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
 
+@Suppress("unused")
 class AndroidApplicationConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) = with(target) {
         println("*** AndroidApplicationConventionPlugin invoke ***")
 
         with(pluginManager) {
             apply("com.android.application")
-            apply("org.jetbrains.kotlin.plugin.compose")
+            apply("org.jetbrains.kotlin.android")
         }
 
         extensions.configure<ApplicationExtension> {
@@ -21,7 +22,7 @@ class AndroidApplicationConventionPlugin : Plugin<Project> {
     }
 }
 
-private fun Project.configureAndroidApplication(applicationExtension: ApplicationExtension) {
+private fun configureAndroidApplication(applicationExtension: ApplicationExtension) {
     applicationExtension.apply {
         compileSdk = Const.TargetSdk
 

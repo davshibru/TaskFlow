@@ -10,6 +10,7 @@ import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.getByType
 
+@Suppress("unused")
 class HiltConventionPlugin : Plugin<Project> {
     override fun apply(target: Project) = with(target) {
         println("*** HiltConventionPlugin invoke ***")
