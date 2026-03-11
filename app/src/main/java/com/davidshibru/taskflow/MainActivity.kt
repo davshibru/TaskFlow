@@ -11,40 +11,30 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.davidshibru.taskflow.core.essentials.exception.ConnectionException
-import com.davidshibru.taskflow.core.essentials.exception.mapper.ExceptionToMessageMapper
-import com.davidshibru.taskflow.core.essentials.logger.Logger
+import com.davidshibru.taskflow.feature.init.presentation.InitScreen
 import com.davidshibru.taskflow.ui.theme.TaskFlowTheme
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    @Inject
-    lateinit var exceptionToMessageMapper: ExceptionToMessageMapper
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        val message = exceptionToMessageMapper.getLocalizedMessage(ConnectionException())
-        val message2 = ExceptionToMessageMapper.getLocalizedMessage(ConnectionException())
-
-        Logger.d(message)
-        Logger.d(message2)
 
         enableEdgeToEdge()
         setContent {
             TaskFlowTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                    App(Modifier.fillMaxSize().padding(innerPadding))
                 }
             }
         }
     }
+}
+
+@Composable
+fun App(modifier: Modifier = Modifier) {
+    InitScreen()
 }
 
 @Composable

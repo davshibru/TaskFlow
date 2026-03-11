@@ -18,6 +18,8 @@ material = "1.10.0"
 jetbrainsKotlinJvm = "2.2.21"
 timber = "5.0.1"
 
+container = "2.0.0-beta01"
+
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -51,6 +53,9 @@ material = { group = "com.google.android.material", name = "material", version.r
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 
 javax-inject = { module = "javax.inject:javax.inject", version = "1" }
+
+container = { module = "com.elveum:container", version.ref = "container" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

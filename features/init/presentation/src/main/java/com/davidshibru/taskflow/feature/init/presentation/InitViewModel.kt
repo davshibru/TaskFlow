@@ -2,35 +2,26 @@ package com.davidshibru.taskflow.feature.init.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.davidshibru.taskflow.core.essentials.Container
-import com.davidshibru.taskflow.core.essentials.containerMap
-import com.davidshibru.taskflow.core.essentials.exception.mapper.ExceptionToMessageMapper
+import com.davidshibru.taskflow.core.essentials.container.Container
+import com.davidshibru.taskflow.core.essentials.container.asContainerStateFlow
+import com.davidshibru.taskflow.feature.init.domain.GetKeyFeatureUseCase
 import com.davidshibru.taskflow.feature.init.domain.entities.KeyFeature
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
-
-interface GetKeyFeatureUseCase {
-    operator fun invoke(): Flow<Container<KeyFeature>>
-}
-
 
 @HiltViewModel
 class InitViewModel @Inject constructor(
-    private val getKeyFeatureUseCase: GetKeyFeatureUseCase,
-    private val exceptionToMessageMapper: ExceptionToMessageMapper,
+    getKeyFeatureUseCase: GetKeyFeatureUseCase,
 ) : ViewModel() {
 
-    val stateFlow: StateFlow<Container<State>> = getKeyFeatureUseCase
-        .invoke()
-        .containerMap { keyFeature -> State(keyFeature) }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(1000), Container.Loading)
+    val stateFlow: StateFlow<Container<State>> = getKeyFeatureUseCase()
+        .map { keyFeature -> State(keyFeature) }
+        .asContainerStateFlow(viewModelScope)
+
 
     data class State(
         val keyFeature: KeyFeature,
     )
-
 }

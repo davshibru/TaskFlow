@@ -7,8 +7,9 @@ android {
     namespace = "com.davidshibru.taskflow.feature.init.presentation"
 }
 dependencies {
-    implementation(project(":features:init:domain"))
+    implementation(projects.features.init.domain)
     implementation(projects.core.essentials)
+    implementation(projects.core.theme)
 
     // ===== base =====
     implementation(libs.androidx.core.ktx)
@@ -21,4 +22,7 @@ dependencies {
     // ===== navigation =====
     implementation(libs.navigation.compose)
     implementation(libs.hilt.navigation)
+
+
+//    implementation(libs.container)
 }
