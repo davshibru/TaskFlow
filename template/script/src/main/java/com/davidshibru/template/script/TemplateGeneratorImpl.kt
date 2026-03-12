@@ -1,5 +1,6 @@
 package com.davidshibru.template.script
 
+import com.davidshibru.template.script.ProjectUtils.toTypeSafeAccessor
 import java.io.File
 
 class TemplateGeneratorImpl {
@@ -27,7 +28,15 @@ class TemplateGeneratorImpl {
             features = args.features.filter { it != "--hilt" && it != "--compose" }
         )
 
-        generateKotlinLibrary("$basePath/domain", "${featureName}UseCase", domainArgs)
+        generateKotlinLibrary(
+            path = "$basePath/domain",
+            className = "${featureName}UseCase",
+            args = domainArgs,
+            predefinedDependencies = listOf(
+                "implementation(projects.core.essentials)",
+            ),
+        )
+
         ProjectUtils.writeSourceFile(
             "$basePath/domain", domainPackageName, "${featureName}UseCase.kt",
             CodeTemplates.useCaseInterface(domainPackageName, featureName)
@@ -39,11 +48,16 @@ class TemplateGeneratorImpl {
             packageName = "${args.packageName}.presentation"
         )
 
+        val domainAccessor = toTypeSafeAccessor(domainModuleName)
+
         generateAndroidLibrary(
             path = "$basePath/presentation",
             className = null,
             args = presentationArgs,
-            predefinedDependencies = listOf("implementation(project(\"$domainModuleName\"))"),
+            predefinedDependencies = listOf(
+                "implementation($domainAccessor)",
+                "implementation(projects.core.essentials)",
+            ),
             extraDependencies = listOf(
                 "androidTestImplementation(libs.androidx.junit)",
                 "androidTestImplementation(libs.androidx.espresso.core)"
@@ -54,6 +68,18 @@ class TemplateGeneratorImpl {
             "$basePath/presentation", presentationArgs.packageName, "${featureName}Router.kt",
             CodeTemplates.routerInterface(presentationArgs.packageName, featureName)
         )
+
+        ProjectUtils.writeSourceFile(
+            "$basePath/presentation", presentationArgs.packageName, "${featureName}ViewModel.kt",
+            CodeTemplates.viewModelClass(presentationArgs.packageName, featureName)
+        )
+
+        ProjectUtils.writeSourceFile(
+            "$basePath/presentation", presentationArgs.packageName, "${featureName}Screen.kt",
+            CodeTemplates.screenClass(presentationArgs.packageName, featureName)
+        )
+
+        ProjectUtils.addToGitIfRequested("$basePath/presentation/src/main/java", args)
     }
 
     private fun generateAndroidLibrary(
@@ -80,6 +106,14 @@ class TemplateGeneratorImpl {
             baseDeps.add("testImplementation(libs.kotlinx.coroutines.test)")
         }
 
+        if (args.features.contains("--navigation")) {
+            baseDeps.add("implementation(libs.navigation.compose)")
+
+            if (args.features.contains("--hilt")) {
+                baseDeps.add("implementation(libs.hilt.navigation)")
+            }
+        }
+
         val allDeps = predefinedDependencies + baseDeps + extraDependencies
 
         val buildGradle = """
@@ -97,12 +131,18 @@ class TemplateGeneratorImpl {
         ProjectUtils.writeFile("$path/build.gradle.kts", buildGradle)
 
         if (className != null) {
-            ProjectUtils.writeSourceFile(path, args.packageName, "$className.kt", CodeTemplates.androidClass(args.packageName, className))
+            ProjectUtils.writeSourceFile(
+                path,
+                args.packageName,
+                "$className.kt",
+                CodeTemplates.androidClass(args.packageName, className)
+            )
         }
 
         generateStandardFiles(path)
 
-        val defaultClassName = className ?: path.substringAfterLast("/").replaceFirstChar { it.uppercase() }
+        val defaultClassName =
+            className ?: path.substringAfterLast("/").replaceFirstChar { it.uppercase() }
         generateUnitTestFile(path, args.packageName, defaultClassName, args)
 
         finishModuleGeneration(path, args)
@@ -112,12 +152,12 @@ class TemplateGeneratorImpl {
         path: String,
         className: String,
         args: InputArgs,
-        extraDependencies: List<String> = emptyList()
+        predefinedDependencies: List<String> = emptyList(),
+        extraDependencies: List<String> = emptyList(),
     ) {
         ProjectUtils.ensureParentBuildFilesExist(path, args)
 
-        val allDeps = listOf("testImplementation(libs.junit)") + extraDependencies
-        val depsContent = allDeps.joinToString("\n    ")
+        val allDeps = predefinedDependencies + listOf("testImplementation(libs.junit)") + extraDependencies
 
         val buildGradle = """
             plugins {
@@ -132,12 +172,17 @@ class TemplateGeneratorImpl {
                 compilerOptions { jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11 }
             }
             dependencies {
-                $depsContent
+                ${allDeps.joinToString("\n                ")}
             }
         """.trimIndent()
 
         ProjectUtils.writeFile("$path/build.gradle.kts", buildGradle)
-        ProjectUtils.writeSourceFile(path, args.packageName, "$className.kt", CodeTemplates.kotlinClass(args.packageName, className))
+        ProjectUtils.writeSourceFile(
+            path,
+            args.packageName,
+            "$className.kt",
+            CodeTemplates.kotlinClass(args.packageName, className)
+        )
 
         ProjectUtils.writeFile("$path/.gitignore", "/build")
         generateUnitTestFile(path, args.packageName, className, args)
@@ -151,15 +196,26 @@ class TemplateGeneratorImpl {
         ProjectUtils.writeFile("$path/.gitignore", "/build")
         ProjectUtils.writeFile("$path/proguard-rules.pro", CodeTemplates.proguardRules())
         ProjectUtils.writeFile("$path/consumer-rules.pro", "# Rules for library consumers.")
-        ProjectUtils.writeFile("$path/src/main/AndroidManifest.xml", """<?xml version="1.0" encoding="utf-8"?><manifest />""")
+        ProjectUtils.writeFile(
+            "$path/src/main/AndroidManifest.xml",
+            """<?xml version="1.0" encoding="utf-8"?><manifest />"""
+        )
     }
 
-    private fun generateUnitTestFile(path: String, packageName: String, className: String, args: InputArgs) {
+    private fun generateUnitTestFile(
+        path: String,
+        packageName: String,
+        className: String,
+        args: InputArgs
+    ) {
         val testDirPath = "$path/src/test/java/${packageName.replace('.', '/')}"
         File(testDirPath).mkdirs()
         val fileName = "${className}Test.kt"
 
-        ProjectUtils.writeFile("$testDirPath/$fileName", CodeTemplates.unitTest(packageName, className))
+        ProjectUtils.writeFile(
+            "$testDirPath/$fileName",
+            CodeTemplates.unitTest(packageName, className)
+        )
         println("   🧪 Created Test file: $fileName")
         ProjectUtils.addToGitIfRequested(testDirPath, args)
     }

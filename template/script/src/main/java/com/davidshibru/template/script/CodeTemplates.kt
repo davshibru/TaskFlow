@@ -64,4 +64,92 @@ object CodeTemplates {
         # By default, the flags in this file are appended to flags specified
         # in ${'$'}ANDROID_HOME/tools/proguard/proguard-android.txt
     """.trimIndent()
+
+    fun viewModelClass(
+        packageName: String,
+        featureName: String,
+        basePackage: String = "com.davidshibru.taskflow" // Твой базовый пакет для импортов Core
+    ) = """
+        package $packageName
+        
+        import androidx.lifecycle.ViewModel
+        import androidx.lifecycle.viewModelScope
+        import $basePackage.core.essentials.container.Container
+        import $basePackage.core.essentials.container.asContainerStateFlow
+        import dagger.hilt.android.lifecycle.HiltViewModel
+        import kotlinx.coroutines.flow.MutableStateFlow
+        import kotlinx.coroutines.flow.StateFlow
+        import kotlinx.coroutines.flow.map
+        import javax.inject.Inject
+        
+        @HiltViewModel
+        class ${featureName}ViewModel @Inject constructor(
+            private val router: ${featureName}Router
+        ) : ViewModel() {
+        
+            private val vmStateFlow = MutableStateFlow(ViewModelState())
+        
+            val stateFlow: StateFlow<Container<State>> = vmStateFlow
+                .map { vmState ->
+                    State(isLoading = vmState.isLoading)
+                }
+                .asContainerStateFlow(viewModelScope)
+        
+            fun onBackClicked() {
+                router.navigateBack()
+            }
+        
+            data class State(
+                val title: String = "${featureName} Feature",
+                val isLoading: Boolean
+            )
+            
+            private data class ViewModelState(
+                val isLoading: Boolean = false
+            )
+        }
+    """.trimIndent()
+
+    fun screenClass(
+        packageName: String,
+        featureName: String,
+        basePackage: String = "com.davidshibru.taskflow"
+    ) = """
+        package $packageName
+        
+        import androidx.compose.foundation.layout.Box
+        import androidx.compose.foundation.layout.fillMaxSize
+        import androidx.compose.material3.Text
+        import androidx.compose.runtime.Composable
+        import androidx.compose.runtime.collectAsState
+        import androidx.compose.runtime.getValue
+        import androidx.compose.ui.Alignment
+        import androidx.compose.ui.Modifier
+        import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+        import $basePackage.core.essentials.container.Container
+        import $basePackage.core.theme.components.ContainerView
+        
+        @Composable
+        fun ${featureName}Screen(
+            viewModel: ${featureName}ViewModel = hiltViewModel()
+        ) {
+            val container: Container<${featureName}ViewModel.State> by viewModel.stateFlow.collectAsState()
+        
+            ContainerView(
+                container = container,
+            ) { state ->
+                ${featureName}Content(state)
+            }
+        }
+        
+        @Composable
+        private fun ${featureName}Content(state: ${featureName}ViewModel.State) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(text = state.title)
+            }
+        }
+    """.trimIndent()
 }

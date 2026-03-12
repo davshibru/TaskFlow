@@ -60,4 +60,13 @@ object ProjectUtils {
             }
         }
     }
+
+    fun toTypeSafeAccessor(moduleName: String): String {
+        val formatted = moduleName.removePrefix(":").split(":").joinToString(".") { part ->
+            part.split("-", "_").mapIndexed { index, s ->
+                if (index == 0) s else s.replaceFirstChar { it.uppercase() }
+            }.joinToString("")
+        }
+        return "projects.$formatted"
+    }
 }
