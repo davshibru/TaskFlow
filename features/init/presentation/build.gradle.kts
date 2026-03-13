@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.convention.android.library)
     alias(libs.plugins.convention.compose)
     alias(libs.plugins.convention.hilt)
+    alias(libs.plugins.convention.serialization)
 }
 android {
     namespace = "com.davidshibru.taskflow.feature.init.presentation"

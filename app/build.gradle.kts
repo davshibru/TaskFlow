@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.convention.android.application)
     alias(libs.plugins.convention.compose)
     alias(libs.plugins.convention.hilt)
+    alias(libs.plugins.convention.serialization)
 }
 
 android {
@@ -15,6 +16,7 @@ android {
 }
 
 dependencies {
+    implementation(projects.core.navigation)
     implementation(projects.core.commonAndroid)
 
     implementation(projects.features.init.presentation)

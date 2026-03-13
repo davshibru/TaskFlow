@@ -11,6 +11,11 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
+}
+
 dependencyResolutionManagement {
     includeBuild("build-logic")
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
@@ -34,3 +39,6 @@ include(":core:common-android")
 include(":features:init:domain")
 include(":features:init:presentation")
 include(":core:theme")
+include(":core:navigation")
+include(":features:sign-in:domain")
+include(":features:sign-in:presentation")

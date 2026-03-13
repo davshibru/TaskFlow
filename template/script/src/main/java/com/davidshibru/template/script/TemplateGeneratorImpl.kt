@@ -57,6 +57,7 @@ class TemplateGeneratorImpl {
             predefinedDependencies = listOf(
                 "implementation($domainAccessor)",
                 "implementation(projects.core.essentials)",
+                "implementation(projects.core.essentials)",
             ),
             extraDependencies = listOf(
                 "androidTestImplementation(libs.androidx.junit)",
@@ -165,11 +166,11 @@ class TemplateGeneratorImpl {
                 alias(libs.plugins.jetbrains.kotlin.jvm)
             }
             java {
-                sourceCompatibility = JavaVersion.VERSION_11
-                targetCompatibility = JavaVersion.VERSION_11
+                sourceCompatibility = JavaVersion.VERSION_17
+                targetCompatibility = JavaVersion.VERSION_17
             }
             kotlin {
-                compilerOptions { jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11 }
+                compilerOptions { jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17 }
             }
             dependencies {
                 ${allDeps.joinToString("\n                ")}

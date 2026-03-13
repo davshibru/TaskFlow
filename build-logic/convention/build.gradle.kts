@@ -8,6 +8,9 @@ java {
     sourceCompatibility = JavaVersion.VERSION_17
     targetCompatibility = JavaVersion.VERSION_17
 }
+kotlin {
+    jvmToolchain(17)
+}
 
 dependencies {
     compileOnly(libs.android.gradlePlugin)
@@ -31,6 +34,10 @@ gradlePlugin {
         create("hilt") {
             id = "com.davidshibru.convention.hilt"
             implementationClass = "com.davidshibru.convention.HiltConventionPlugin"
+        }
+        create("serialization") {
+            id = "com.davidshibru.convention.serialization"
+            implementationClass = "com.davidshibru.convention.SerializationConventionPlugin"
         }
     }
 }
