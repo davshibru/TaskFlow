@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
 import com.davidshibru.taskflow.core.common.android.AndroidExceptionHandler
 import com.davidshibru.taskflow.core.navigation.AppNavHost
-import com.davidshibru.taskflow.core.navigation.base.NavComponentAppRouter
+import com.davidshibru.taskflow.core.navigation.base.AppNavigator
 import com.davidshibru.taskflow.ui.theme.TaskFlowTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -17,7 +17,7 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
 
     @Inject
-    lateinit var appRouter: NavComponentAppRouter
+    lateinit var appNavigator: AppNavigator
 
     @Inject
     lateinit var exceptionHandler: AndroidExceptionHandler
@@ -28,10 +28,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             TaskFlowTheme {
-                AppNavHost(
-                    modifier = Modifier.fillMaxSize(),
-                    appRouter = appRouter,
-                )
+                AppNavHost(modifier = Modifier.fillMaxSize(), appNavigator = appNavigator)
                 exceptionHandler.ErrorDialog()
             }
         }

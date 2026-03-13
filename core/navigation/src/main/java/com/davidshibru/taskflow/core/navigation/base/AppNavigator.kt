@@ -1,12 +1,12 @@
 package com.davidshibru.taskflow.core.navigation.base
 
 import com.davidshibru.taskflow.core.navigation.Route
+import kotlinx.coroutines.flow.Flow
 
-interface AppRouter {
+interface AppNavigator {
+    val navigationEvents: Flow<NavigationIntent>
 
     fun launch(route: Route)
-
     fun restart(route: Route)
-
     fun goBack()
 }
