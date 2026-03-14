@@ -9,8 +9,10 @@ android {
 }
 dependencies {
     implementation(projects.features.init.domain)
-    implementation(projects.core.essentials)
+
     implementation(projects.core.theme)
+    implementation(projects.core.essentials)
+    implementation(projects.core.navigationDsl)
 
     // ===== base =====
     implementation(libs.androidx.core.ktx)

@@ -50,8 +50,9 @@ class InitViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 ensureActive()
-                hideProgress()
                 exceptionHandler.handleException(e)
+            } finally {
+                hideProgress()
             }
         }
     }

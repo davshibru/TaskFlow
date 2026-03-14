@@ -9,8 +9,11 @@ android {
 }
 dependencies {
     implementation(projects.features.signIn.domain)
-    implementation(projects.core.essentials)
+
     implementation(projects.core.theme)
+    implementation(projects.core.essentials)
+    implementation(projects.core.navigationDsl)
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

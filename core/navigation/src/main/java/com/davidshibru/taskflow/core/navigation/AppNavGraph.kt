@@ -1,11 +1,11 @@
 package com.davidshibru.taskflow.core.navigation
 
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.composable
-import com.davidshibru.taskflow.feature.init.presentation.InitScreen
-import com.davidshibru.taskflow.features.signin.presentation.SignInScreen
+import com.davidshibru.taskflow.core.navigation.base.ExtendedNavGraphBuilder
+import com.davidshibru.taskflow.core.navigation.base.composable
+import com.davidshibru.taskflow.feature.init.presentation.initScreen
+import com.davidshibru.taskflow.features.signin.presentation.signInScreen
 
-fun NavGraphBuilder.buildAppNavGraph() {
-    composable<InitRoute> { InitScreen() }
-    composable<SignInRoute> { SignInScreen() }
+fun ExtendedNavGraphBuilder.buildAppNavGraph() {
+    composable<InitRoute> { initScreen() }
+    composable<SignInRoute> { signInScreen() }
 }

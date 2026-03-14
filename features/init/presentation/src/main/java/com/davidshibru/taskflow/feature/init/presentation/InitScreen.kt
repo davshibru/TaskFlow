@@ -22,25 +22,32 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.davidshibru.taskflow.core.essentials.container.Container
+import com.davidshibru.taskflow.core.navigation.dsl.ScreenScope
+import com.davidshibru.taskflow.core.navigation.dsl.ScreenToolbar
 import com.davidshibru.taskflow.core.theme.components.ContainerView
 import com.davidshibru.taskflow.feature.init.domain.entities.KeyFeature
 import com.davidshibru.taskflow.feature.init.presentation.InitViewModel.State
 
-@Composable
-fun InitScreen() {
-    val viewModel: InitViewModel = hiltViewModel()
-    val container: Container<State> by viewModel.stateFlow.collectAsState()
+fun ScreenScope.initScreen() {
 
-    ContainerView(
-        container = container,
-        modifier = Modifier.fillMaxSize()
-    ) { state ->
-        InitScreen(
-            state = state,
-            onLetsGoClicked = viewModel::letsGo
-        )
+    toolbar = ScreenToolbar.Hidden
+
+    content {
+        val viewModel: InitViewModel = hiltViewModel()
+        val container: Container<State> by viewModel.stateFlow.collectAsState()
+
+        ContainerView(
+            container = container,
+            modifier = Modifier.fillMaxSize()
+        ) { state ->
+            InitScreen(
+                state = state,
+                onLetsGoClicked = viewModel::letsGo
+            )
+        }
     }
 }
+
 
 @Composable
 private fun InitScreen(
