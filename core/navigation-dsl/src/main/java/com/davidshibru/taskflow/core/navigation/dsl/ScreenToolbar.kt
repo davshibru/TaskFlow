@@ -6,5 +6,6 @@ sealed class ScreenToolbar {
 
     data class Default(
         val title: String,
+        val actions: List<ToolbarAction> = emptyList(),
     ) : ScreenToolbar()
 }

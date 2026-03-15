@@ -17,6 +17,7 @@ appcompat = "1.6.1"
 material = "1.10.0"
 jetbrainsKotlinJvm = "2.2.21"
 timber = "5.0.1"
+coil = "3.4.0"
 
 container = "2.0.0-beta01"
 
@@ -58,6 +59,8 @@ javax-inject = { module = "javax.inject:javax.inject", version = "1" }
 
 container = { module = "com.elveum:container", version.ref = "container" }
 
+coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil"}
+coil-network = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coil"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

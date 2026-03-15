@@ -57,6 +57,7 @@ fun AppNavHost(
             if (toolbar is ScreenToolbar.Default) {
                 AppToolBar(
                     title = toolbar.title,
+                    actions = toolbar.actions,
                     showBackButton = showBackButton,
                     onBackPressed = {
                         navController.navigateUp()

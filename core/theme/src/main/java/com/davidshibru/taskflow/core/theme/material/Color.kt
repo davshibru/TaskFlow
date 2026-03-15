@@ -1,4 +1,4 @@
-package com.davidshibru.taskflow.ui.theme
+package com.davidshibru.taskflow.core.theme.material
 
 import androidx.compose.ui.graphics.Color
 

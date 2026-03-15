@@ -1,0 +1,4 @@
+com.davidshibru.taskflow.feature.*.domain.entities.**
+com.davidshibru.taskflow.core.essentials.container.Container<_>
+com.davidshibru.taskflow.core.essentials.exception.mapper.ExceptionToMessageMapper
+com.davidshibru.taskflow.core.essentials.entities.**

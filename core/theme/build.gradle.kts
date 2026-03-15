@@ -9,6 +9,11 @@ android {
 dependencies {
     implementation(projects.core.essentials)
 
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network)
+
+    implementation(libs.androidx.compose.material.icons.extended)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

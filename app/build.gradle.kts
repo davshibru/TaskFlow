@@ -16,6 +16,7 @@ android {
 }
 
 dependencies {
+    implementation(projects.core.theme)
     implementation(projects.core.navigation)
     implementation(projects.core.commonAndroid)
 

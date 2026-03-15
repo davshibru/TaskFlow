@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import com.davidshibru.taskflow.core.common.android.AndroidExceptionHandler
 import com.davidshibru.taskflow.core.navigation.AppNavHost
 import com.davidshibru.taskflow.core.navigation.base.AppNavigator
-import com.davidshibru.taskflow.ui.theme.TaskFlowTheme
+import com.davidshibru.taskflow.core.theme.material.TaskFlowTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

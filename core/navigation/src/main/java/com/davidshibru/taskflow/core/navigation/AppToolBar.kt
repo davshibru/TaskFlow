@@ -10,18 +10,30 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import com.davidshibru.taskflow.core.navigation.dsl.ToolbarAction
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppToolBar(
     title: String,
+    actions: List<ToolbarAction>,
     showBackButton: Boolean,
     onBackPressed: () -> Unit,
 ) {
     TopAppBar(
         title = {
             Text(text = title)
+        },
+        actions = {
+            actions.forEach { action ->
+                IconButton(onClick = action.onClick) {
+                    Icon(
+                        imageVector = action.icon,
+                        contentDescription = action.contentDescription
+                    )
+                }
+            }
         },
         navigationIcon = {
             if (showBackButton) {
