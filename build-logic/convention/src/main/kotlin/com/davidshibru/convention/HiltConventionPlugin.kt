@@ -39,7 +39,7 @@ private fun Project.configureHiltPlugin(commonExtension: CommonExtension) {
 
     commonExtension.apply {
         dependencies {
-            val hiltCore = libs.findLibrary("hilt.core").get()
+            val hiltCore = libs.findLibrary("hilt.android").get()
             val hiltCompiler = libs.findLibrary("hilt.compiler").get()
             add("implementation", hiltCore)
             add("ksp", hiltCompiler)

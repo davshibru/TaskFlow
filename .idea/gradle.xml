@@ -30,6 +30,7 @@
             <option value="$PROJECT_DIR$/core/essentials" />
             <option value="$PROJECT_DIR$/core/navigation" />
             <option value="$PROJECT_DIR$/core/navigation-dsl" />
+            <option value="$PROJECT_DIR$/core/presentation" />
             <option value="$PROJECT_DIR$/core/theme" />
             <option value="$PROJECT_DIR$/features" />
             <option value="$PROJECT_DIR$/features/init" />
