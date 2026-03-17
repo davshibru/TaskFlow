@@ -32,6 +32,7 @@
             <option value="$PROJECT_DIR$/core/navigation-dsl" />
             <option value="$PROJECT_DIR$/core/presentation" />
             <option value="$PROJECT_DIR$/core/theme" />
+            <option value="$PROJECT_DIR$/data" />
             <option value="$PROJECT_DIR$/features" />
             <option value="$PROJECT_DIR$/features/init" />
             <option value="$PROJECT_DIR$/features/init/demo" />
@@ -41,6 +42,7 @@
             <option value="$PROJECT_DIR$/features/sign-in/demo" />
             <option value="$PROJECT_DIR$/features/sign-in/domain" />
             <option value="$PROJECT_DIR$/features/sign-in/presentation" />
+            <option value="$PROJECT_DIR$/glue" />
             <option value="$PROJECT_DIR$/template" />
             <option value="$PROJECT_DIR$/template/android-library" />
             <option value="$PROJECT_DIR$/template/kotlin-library" />

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="feature_1_title">Быстрая отправка сообщений</string>
+    <string name="feature_2_title">Улучшенные уведомления</string>
+    <string name="feature_3_title">Обновлённый интерфейс чата</string>
+    <string name="feature_description_1">Сообщения теперь отправляются заметно быстрее и стабильнее.</string>
+    <string name="feature_description_2">Уведомления о новых сообщениях стали точнее и приходят без задержек.</string>
+    <string name="feature_description_3">Мы сделали экран переписки чище и удобнее.</string>
+</resources>

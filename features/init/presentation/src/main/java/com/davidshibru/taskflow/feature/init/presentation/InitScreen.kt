@@ -25,6 +25,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.davidshibru.taskflow.core.essentials.container.Container
+import com.davidshibru.taskflow.core.essentials.entities.Id
 import com.davidshibru.taskflow.core.essentials.entities.ImageSource
 import com.davidshibru.taskflow.core.navigation.dsl.ScreenScope
 import com.davidshibru.taskflow.core.navigation.dsl.ScreenToolbar
@@ -202,7 +203,7 @@ private fun InitScreenPreview() = PreviewScreenContent {
     InitScreen(
         state = State(
             KeyFeature(
-                id = 1,
+                id = Id.Empty,
                 title = "Выбранный нами инновационный путь бодрит",
                 description = "В целом, конечно, внедрение современных методик является качественно новой ступенью анализа существующих паттернов поведения.",
                 imageSource = ImageSource.Empty as ImageSource,

@@ -49,7 +49,7 @@ class ShowRandomKeyFeatureUseCaseImpl @Inject constructor(
 
     private suspend fun saveDisplayTime(keyFeature: KeyFeature) {
         val now = dateTimeRepository.now()
-        keyFeatureRepository.saveDisplayTime(keyFeature.id, now)
+        keyFeatureRepository.saveDisplayTime(keyFeature, now)
     }
 
     private suspend fun getRandomKeyFeature(): KeyFeature {

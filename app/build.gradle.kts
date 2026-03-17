@@ -20,6 +20,8 @@ dependencies {
     implementation(projects.core.navigation)
     implementation(projects.core.commonAndroid)
 
+    implementation(projects.glue)
+
     implementation(projects.features.init.presentation)
 
     implementation(libs.androidx.core.ktx)

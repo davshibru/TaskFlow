@@ -1,12 +1,13 @@
 package com.davidshibru.taskflow.feature.init.domain.entities
 
+import com.davidshibru.taskflow.core.essentials.entities.Id
 import com.davidshibru.taskflow.core.essentials.entities.ImageSource
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 
 data class KeyFeature(
-    val id: Long,
+    val id: Id,
     val title: String,
     val description: String,
     val imageSource: ImageSource,

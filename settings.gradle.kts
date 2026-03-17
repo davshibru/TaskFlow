@@ -48,3 +48,5 @@ include(":core:presentation")
 
 include(":features:init:demo")
 include(":features:sign-in:demo")
+include(":data")
+include(":glue")

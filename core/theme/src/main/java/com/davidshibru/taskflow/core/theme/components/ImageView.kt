@@ -8,6 +8,7 @@ import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.SubcomposeAsyncImage
@@ -23,8 +24,24 @@ fun ImageView(
     when (imageSource) {
         is ImageSource.Remote -> RemoteImage(imageSource, contentDescription, modifier)
         is ImageSource.Empty -> EmptyImage(modifier, contentDescription)
-
+        is ImageSource.Resource -> LocalImageView(imageSource.resId, contentDescription, modifier)
     }
+}
+
+@Composable
+private fun LocalImageView(
+    resId: Int,
+    contentDescription: String?,
+    modifier: Modifier
+) {
+    Image(
+        modifier = modifier.background(
+            color = MaterialTheme.colorScheme.secondaryContainer,
+            shape = Shapes.MediumRoundedCornerShape,
+        ),
+        painter = painterResource(resId),
+        contentDescription = contentDescription,
+    )
 }
 
 @Composable
