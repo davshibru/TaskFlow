@@ -44,7 +44,7 @@ include(":features:sign-in:domain")
 include(":features:sign-in:presentation")
 include(":core:navigation-dsl")
 include(":core:presentation")
-//include(":app-demo")
+include(":app-demo")
 
 include(":features:init:demo")
 include(":features:sign-in:demo")

@@ -8,6 +8,7 @@ android {
 }
 dependencies {
     implementation(projects.core.essentials)
+
     implementation(projects.features.init.domain)
 
     implementation(libs.androidx.core.ktx)

@@ -6,5 +6,7 @@ import com.davidshibru.taskflow.feature.init.presentation.initScreen
 
 @Composable
 fun DemoScreen() {
-    InitScreen()
+    ProvideDemoScreen {
+        initScreen()
+    }
 }

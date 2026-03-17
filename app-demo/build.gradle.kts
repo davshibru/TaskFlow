@@ -12,12 +12,10 @@ android {
     productFlavors {
         create("init") {
             dimension = "feature"
-            resValue("string", "app_name", "Demo: Init")
             applicationIdSuffix = ".init"
         }
         create("signin") {
             dimension = "feature"
-            resValue("string", "app_name", "Demo: SignIn")
             applicationIdSuffix = ".signin"
         }
     }
@@ -30,6 +28,10 @@ android {
 }
 
 dependencies {
+    implementation(projects.core.essentials)
+    implementation(projects.core.commonAndroid)
+    implementation(projects.core.navigationDsl)
+
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
