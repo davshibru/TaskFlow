@@ -9,8 +9,12 @@ android {
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.compose.material.icons.extended)
+
     implementation(libs.material)
+
     testImplementation(libs.junit)
+
     implementation(libs.navigation.compose)
     implementation(libs.hilt.navigation)
 }

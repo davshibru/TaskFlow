@@ -56,8 +56,7 @@ fun AppNavHost(
             val toolbar = navStore.screen.toolbar
             if (toolbar is ScreenToolbar.Default) {
                 AppToolBar(
-                    title = toolbar.title,
-                    actions = toolbar.actions,
+                    toolbar = toolbar,
                     showBackButton = showBackButton,
                     onBackPressed = {
                         navController.navigateUp()

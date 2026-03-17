@@ -8,6 +8,7 @@ android {
 }
 dependencies {
     implementation(projects.core.essentials)
+    implementation(projects.core.navigationDsl)
 
     implementation(libs.coil.compose)
     implementation(libs.coil.network)

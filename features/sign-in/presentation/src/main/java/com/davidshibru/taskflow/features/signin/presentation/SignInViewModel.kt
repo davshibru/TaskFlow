@@ -22,9 +22,6 @@ class SignInViewModel @Inject constructor(
         }
         .asContainerStateFlow(viewModelScope)
 
-    fun onBackClicked() {
-//        router.navigateBack()
-    }
 
     data class State(
         val title: String = "SignIn Feature",

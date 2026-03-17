@@ -44,6 +44,8 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    implementation(libs.androidx.compose.material.icons.extended)
+
     "initImplementation"(projects.features.init.presentation)
     "initImplementation"(projects.features.init.demo)
     "signinImplementation"(projects.features.signIn.presentation)

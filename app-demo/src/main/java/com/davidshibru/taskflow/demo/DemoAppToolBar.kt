@@ -1,4 +1,4 @@
-package com.davidshibru.taskflow.core.navigation
+package com.davidshibru.taskflow.demo
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.Icons
@@ -23,10 +23,9 @@ import androidx.compose.ui.res.stringResource
 import com.davidshibru.taskflow.core.navigation.dsl.ScreenToolbar
 import com.davidshibru.taskflow.core.navigation.dsl.ToolbarAction
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppToolBar(
+fun DemoAppToolBar(
     toolbar: ScreenToolbar.Default,
     showBackButton: Boolean,
     onBackPressed: () -> Unit,
