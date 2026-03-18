@@ -3,4 +3,8 @@
     <string name="sign_in">Sign In</string>
     <string name="terms_and_conditions">Terms and Conditions</string>
     <string name="privacy_policy">Privacy policy</string>
+    <string name="invalid_login_and_or_password">Invalid login and/or password</string>
+    <string name="login">Login</string>
+    <string name="password">Password</string>
+    <string name="empty_field_error">%1$s is empty</string>
 </resources>

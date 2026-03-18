@@ -12,6 +12,7 @@ dependencies {
 
     implementation(projects.core.theme)
     implementation(projects.core.essentials)
+    implementation(projects.core.presentation)
     implementation(projects.core.navigationDsl)
 
 

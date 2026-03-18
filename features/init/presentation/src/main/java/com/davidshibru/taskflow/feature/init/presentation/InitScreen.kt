@@ -35,6 +35,7 @@ import com.davidshibru.taskflow.core.theme.previews.PreviewScreenContent
 import com.davidshibru.taskflow.core.theme.previews.ScreenPreview
 import com.davidshibru.taskflow.core.theme.components.ContainerView
 import com.davidshibru.taskflow.core.theme.components.ImageView
+import com.davidshibru.taskflow.core.theme.components.ProgressButton
 import com.davidshibru.taskflow.feature.init.domain.entities.KeyFeature
 import com.davidshibru.taskflow.feature.init.presentation.InitViewModel.State
 
@@ -177,22 +178,14 @@ fun LandscapeInitScreen(
                 text = keyFeature.description,
                 textAlign = TextAlign.Center,
             )
+
             MediumVerticalSpace()
 
-            Button(
-                onClick = onLetsGoClicked,
-                enabled = !state.isCheckAuthInProgress
-            ) {
-                if (state.isCheckAuthInProgress) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        strokeWidth = 2.dp
-                    )
-                } else {
-                    Text(text = stringResource(R.string.let_s_go))
-                }
-            }
+            ProgressButton(
+                text = stringResource(R.string.let_s_go),
+                isInProgress = state.isCheckAuthInProgress,
+                onClick = onLetsGoClicked
+            )
         }
     }
 }
@@ -212,5 +205,4 @@ private fun InitScreenPreview() = PreviewScreenContent {
         ),
         onLetsGoClicked = {},
     )
-
 }

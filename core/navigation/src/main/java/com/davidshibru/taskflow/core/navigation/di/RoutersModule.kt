@@ -1,7 +1,9 @@
 package com.davidshibru.taskflow.core.navigation.di
 
 import com.davidshibru.taskflow.core.navigation.routers.InitRouterImpl
+import com.davidshibru.taskflow.core.navigation.routers.SignInRouterImpl
 import com.davidshibru.taskflow.feature.init.presentation.InitRouter
+import com.davidshibru.taskflow.features.signin.presentation.SignInRouter
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -16,4 +18,8 @@ interface RoutersModule {
         initRouterImpl: InitRouterImpl
     ): InitRouter
 
+    @Binds
+    fun bindSignInRouter(
+        signInRouterImpl: SignInRouterImpl,
+    ): SignInRouter
 }

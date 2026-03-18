@@ -1,34 +1,59 @@
 package com.davidshibru.taskflow.features.signin.presentation
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.davidshibru.taskflow.core.essentials.container.Container
 import com.davidshibru.taskflow.core.essentials.container.asContainerStateFlow
+import com.davidshibru.taskflow.core.presentation.WithMviState
+import com.davidshibru.taskflow.core.presentation.base.AbstractViewModel
+import com.davidshibru.taskflow.features.signin.domain.SignInUseCase
+import com.davidshibru.taskflow.features.signin.domain.entities.Credentials
+import com.davidshibru.taskflow.features.signin.domain.entities.InputField
+import com.davidshibru.taskflow.features.signin.domain.exceptions.EmptyFieldException
+import com.davidshibru.taskflow.features.signin.domain.resources.SignInStringProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 @HiltViewModel
 class SignInViewModel @Inject constructor(
-) : ViewModel() {
+    private val router: SignInRouter,
+    private val signInUseCase: SignInUseCase,
+    private val signInStringProvider: SignInStringProvider,
+) : AbstractViewModel(), WithMviState<SignInViewModel.State> {
 
-    private val vmStateFlow = MutableStateFlow(ViewModelState())
+    private val _stateFlow = MutableStateFlow(State())
+    val stateFlow = combine(_stateFlow, progressStateFlow) { state, inProgress ->
+        state.copy(isLoginInProgress = inProgress)
+    }.asContainerStateFlow(viewModelScope)
 
-    val stateFlow: StateFlow<Container<State>> = vmStateFlow
-        .map { vmState ->
-            State(isLoading = vmState.isLoading)
+
+    fun signIn(credentials: Credentials) = launch {
+        try {
+            signInUseCase.invoke(credentials)
+            router.launchMain()
+        } catch (e: EmptyFieldException) {
+            showEmptyFieldErrorMessage(e.inputField)
         }
-        .asContainerStateFlow(viewModelScope)
+    }
 
+    fun clearErrorMessages() {
+        _stateFlow.update { it.copy(emptyFieldError = null) }
+    }
+
+    private fun showEmptyFieldErrorMessage(field: InputField) {
+        val emptyErrorMessage = signInStringProvider.emptyFieldError(field)
+        val emptyFieldError = EmptyFieldError(field, emptyErrorMessage)
+        _stateFlow.update { it.copy(emptyFieldError = emptyFieldError) }
+    }
 
     data class State(
-        val title: String = "SignIn Feature",
-        val isLoading: Boolean = false,
+        val isLoginInProgress: Boolean = false,
+        val emptyFieldError: EmptyFieldError? = null,
     )
-    
-    private data class ViewModelState(
-        val isLoading: Boolean = false
+
+    data class EmptyFieldError(
+        val field: InputField,
+        val message: String
     )
 }

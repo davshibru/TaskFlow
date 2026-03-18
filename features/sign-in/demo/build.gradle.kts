@@ -7,6 +7,8 @@ android {
     namespace = "com.davidshibru.taskflow.features.signin.demo"
 }
 dependencies {
+    implementation(projects.features.signIn.domain)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
