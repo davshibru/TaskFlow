@@ -39,5 +39,9 @@ gradlePlugin {
             id = "com.davidshibru.convention.serialization"
             implementationClass = "com.davidshibru.convention.SerializationConventionPlugin"
         }
+        create("retrofit") {
+            id = "com.davidshibru.convention.retrofit"
+            implementationClass = "com.davidshibru.convention.RetrofitConventionPlugin"
+        }
     }
 }

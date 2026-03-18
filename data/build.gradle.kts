@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.convention.android.library)
+    alias(libs.plugins.convention.retrofit)
     alias(libs.plugins.convention.hilt)
 }
 android {
@@ -7,6 +8,7 @@ android {
 }
 dependencies {
     api(projects.core.essentials)
+    implementation(projects.core.data)
 
     implementation(libs.datastore.preferences)
 

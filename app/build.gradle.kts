@@ -13,9 +13,14 @@ android {
         versionCode = 1
         versionName = "1.0"
     }
+
+    buildFeatures {
+        buildConfig = true
+    }
 }
 
 dependencies {
+    implementation(projects.core.data)
     implementation(projects.core.theme)
     implementation(projects.core.navigation)
     implementation(projects.core.commonAndroid)

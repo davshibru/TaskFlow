@@ -28,6 +28,7 @@
             <option value="$PROJECT_DIR$/build-logic/convention" />
             <option value="$PROJECT_DIR$/core" />
             <option value="$PROJECT_DIR$/core/common-android" />
+            <option value="$PROJECT_DIR$/core/data" />
             <option value="$PROJECT_DIR$/core/essentials" />
             <option value="$PROJECT_DIR$/core/navigation" />
             <option value="$PROJECT_DIR$/core/navigation-dsl" />

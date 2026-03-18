@@ -46,6 +46,14 @@ sealed class Container<out T> {
 
     fun loadingContainer() : Loading = Loading
 
+    fun unwrap(): T {
+        return when (this) {
+            is Success -> value
+            is Error -> throw exception
+            Loading -> throw IllegalStateException("Cannot unwrap Loading container")
+        }
+    }
+
     data object Loading : Container<Nothing>()
 
     data class Error(
