@@ -9,6 +9,7 @@ android {
 dependencies {
     api(projects.core.essentials)
     implementation(projects.core.data)
+    implementation(projects.core.network)
 
     implementation(libs.datastore.preferences)
 

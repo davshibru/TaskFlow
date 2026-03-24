@@ -7,6 +7,7 @@ android {
     namespace = "com.davidshibru.taskflow.core.data"
 }
 dependencies {
+    implementation(projects.core.network)
     implementation(projects.core.essentials)
 
     implementation(libs.androidx.core.ktx)
