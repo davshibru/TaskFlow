@@ -5,9 +5,9 @@ import com.davidshibru.taskflow.data.accounts.remote.dto.SignInResponseDto
 import retrofit2.http.Body
 import retrofit2.http.POST
 
-interface AccountsApi {
+internal interface AccountsApi {
 
-    @POST
+    @POST("login")
     suspend fun signIn(
         @Body request: SignInRequestDto,
     ): SignInResponseDto

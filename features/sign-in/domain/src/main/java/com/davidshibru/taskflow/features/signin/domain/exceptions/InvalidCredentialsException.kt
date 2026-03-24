@@ -4,7 +4,9 @@ import com.davidshibru.taskflow.features.signin.domain.exceptions.base.AbstractS
 import com.davidshibru.taskflow.features.signin.domain.resources.SignInStringProvider
 
 
-class InvalidCredentialsException : AbstractSignInAppException("Invalid login or password") {
+class InvalidCredentialsException(
+    cause: Throwable? = null,
+) : AbstractSignInAppException("Invalid login or password", cause) {
     override fun getLocalizedErrorMessage(stringProvider: SignInStringProvider): String {
         return stringProvider.invalidCredentialsError
     }

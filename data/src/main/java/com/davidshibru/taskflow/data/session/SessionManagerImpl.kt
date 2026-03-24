@@ -13,7 +13,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 internal class SessionManagerImpl @Inject constructor(
     private val dataStore: DataStore<Preferences>,
 ) : SessionProvider, SessionManager, AuthTokenProvider {

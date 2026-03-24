@@ -1,5 +1,7 @@
 package com.davidshibru.taskflow.data.session.di
 
+import com.davidshibru.taskflow.core.data.network.interceptor.AuthTokenProvider
+import com.davidshibru.taskflow.data.SessionManager
 import com.davidshibru.taskflow.data.SessionProvider
 import com.davidshibru.taskflow.data.session.SessionManagerImpl
 import dagger.Binds
@@ -13,4 +15,10 @@ internal interface SessionModule {
 
     @Binds
     fun bindSessionProvider(impl: SessionManagerImpl): SessionProvider
+
+    @Binds
+    fun bindSessionManager(impl: SessionManagerImpl): SessionManager
+
+    @Binds
+    fun bindAuthTokenProvider(impl: SessionManagerImpl): AuthTokenProvider
 }

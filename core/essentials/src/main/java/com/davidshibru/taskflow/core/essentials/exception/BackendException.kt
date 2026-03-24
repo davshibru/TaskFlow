@@ -5,11 +5,11 @@ import com.davidshibru.taskflow.core.essentials.resources.CoreStringProvider
 
 
 class BackendException(
-    val httpCode: Int = 400,
+    val code: Int = 400,
     val backendMessage: String = "",
     cause: Throwable? = null
 ) : AbstractCoreAppException("Server error", cause) {
     override fun getLocalizedErrorMessage(stringProvider: CoreStringProvider): String {
-        return stringProvider.backendErrorMessage(httpCode, backendMessage)
+        return stringProvider.backendErrorMessage(code, backendMessage)
     }
 }

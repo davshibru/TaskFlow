@@ -2,6 +2,8 @@ package com.davidshibru.taskflow.core.essentials.container
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlin.reflect.KClass
+
 typealias ReloadAction = () -> Unit
 
 interface ContainerScope {
@@ -73,6 +75,26 @@ fun <T, R> Container<T>.map(mapper: (T) -> R): Container<R> {
         onError = { Container.Error(it, reloadAction) },
         onLoading = { Container.Loading }
     )
+}
+
+/**
+ * Maps the exception of the container if it matches the [exceptionClass].
+ */
+inline fun <T, E : Exception> Container<T>.mapException(
+    exceptionClass: KClass<E>,
+    crossinline mapper: (E) -> Exception
+): Container<T> {
+    val current = this
+    return if (current is Container.Error && exceptionClass.isInstance(current.exception)) {
+        try {
+            val mappedException = mapper(current.exception as E)
+            Container.Error(mappedException, current.reloadAction)
+        } catch (e: Exception) {
+            Container.Error(e, current.reloadAction)
+        }
+    } else {
+        this
+    }
 }
 
 fun <T, R> Flow<Container<T>>.containerMap(mapper: (T) -> R): Flow<Container<R>> {

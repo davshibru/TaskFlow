@@ -13,17 +13,17 @@ class SignInRouterImpl @Inject constructor(
 ) : SignInRouter{
     override fun launchTermsAndConditions() {
         Toast.makeText(context, "ToDo: Launch Terms and Conditions", Toast.LENGTH_SHORT).show()
-        TODO("Not yet implemented")
+
     }
 
     override fun launchPrivacyPolicy() {
         Toast.makeText(context, "ToDo: Launch Privacy Policy", Toast.LENGTH_SHORT).show()
-        TODO("Not yet implemented")
+
     }
 
     override fun launchMain() {
         Toast.makeText(context, "ToDo: Launch Main", Toast.LENGTH_SHORT).show()
-        TODO("Not yet implemented")
+
     }
 
 
