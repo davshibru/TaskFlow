@@ -152,4 +152,79 @@ object CodeTemplates {
             }
         }
     """.trimIndent()
+
+    fun entityClass(packageName: String, featureName: String) = """
+        package $packageName
+        
+        data class ${featureName}Entity(
+            val id: String = ""
+        )
+    """.trimIndent()
+
+    fun exceptionClass(packageName: String, featureName: String) = """
+        package $packageName
+        
+        sealed class ${featureName}Exception : Exception() {
+            class Default(override val message: String? = null) : ${featureName}Exception()
+        }
+    """.trimIndent()
+
+    fun repositoryInterface(packageName: String, featureName: String) = """
+        package $packageName
+        
+        interface ${featureName}Repository {
+            // TODO: Add repository methods
+        }
+    """.trimIndent()
+
+    // --- ШАБЛОНЫ ДЛЯ DEMO СЛОЯ ---
+
+    fun demoRepositoryClass(
+        packageName: String,
+        domainPackageName: String,
+        featureName: String,
+        basePackage: String = "com.davidshibru.taskflow"
+    ) = """
+        package $packageName
+        
+        import $domainPackageName.repositories.${featureName}Repository
+        import kotlinx.coroutines.delay
+        import javax.inject.Inject
+        import javax.inject.Singleton
+        
+        @Singleton
+        class Demo${featureName}Repository @Inject constructor() : ${featureName}Repository {
+            
+            // TODO: Implement fake methods from ${featureName}Repository
+            /* Example:
+            override suspend fun execute() {
+                delay(2000L) // Fake network delay
+            }
+            */
+        }
+    """.trimIndent()
+
+    fun demoHiltModule(
+        packageName: String,
+        domainPackageName: String,
+        featureName: String
+    ) = """
+        package $packageName
+        
+        import $domainPackageName.repositories.${featureName}Repository
+        import dagger.Binds
+        import dagger.Module
+        import dagger.hilt.InstallIn
+        import dagger.hilt.components.SingletonComponent
+        
+        @Module
+        @InstallIn(SingletonComponent::class)
+        interface ${featureName}DemoModule {
+        
+            @Binds
+            fun bind${featureName}Repository(
+                impl: Demo${featureName}Repository
+            ): ${featureName}Repository
+        }
+    """.trimIndent()
 }

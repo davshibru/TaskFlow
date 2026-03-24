@@ -19,35 +19,75 @@ class TemplateGeneratorImpl {
     private fun generateFeatureModule(basePath: String, featureName: String, args: InputArgs) {
         println("🚀 Creating feature module: $featureName...")
 
-        // --- 1. Создаем Domain ---
+        // --- 1. ДОМЕННЫЙ СЛОЙ (DOMAIN) ---
         val domainModuleName = "${args.moduleName}:domain"
         val domainPackageName = "${args.packageName}.domain"
+        val forDomainArgs = args.features.toMutableList()
+        forDomainArgs.add("--ksp")
         val domainArgs = args.copy(
             moduleName = domainModuleName,
             packageName = domainPackageName,
-            features = args.features.filter { it != "--hilt" && it != "--compose" }
+            features = forDomainArgs.filter { it != "--hilt" && it != "--compose" }
         )
 
         generateKotlinLibrary(
             path = "$basePath/domain",
-            className = "${featureName}UseCase",
+            className = "DomainMarker", // Временный маркер, можно удалить
             args = domainArgs,
             predefinedDependencies = listOf(
                 "implementation(projects.core.essentials)",
+                "implementation(libs.hilt.core)",
+                "ksp(libs.hilt.compiler)",
+                "implementation(libs.javax.inject)",
             ),
+        )
+        // Удаляем маркерный класс, так как мы сгенерируем структуру вручную
+        File(
+            "$basePath/domain/src/main/java/${
+                domainPackageName.replace(
+                    ".",
+                    "/"
+                )
+            }/DomainMarker.kt"
+        ).delete()
+
+        // Генерируем структуру папок как на скриншоте
+        ProjectUtils.writeSourceFile(
+            "$basePath/domain", "$domainPackageName.entities", "${featureName}Entity.kt",
+            CodeTemplates.entityClass("$domainPackageName.entities", featureName)
         )
 
         ProjectUtils.writeSourceFile(
-            "$basePath/domain", domainPackageName, "${featureName}UseCase.kt",
-            CodeTemplates.useCaseInterface(domainPackageName, featureName)
+            "$basePath/domain", "$domainPackageName.exceptions.base", "${featureName}Exception.kt",
+            CodeTemplates.exceptionClass("$domainPackageName.exceptions.base", featureName)
         )
 
-        // --- 2. Создаем Presentation ---
+        ProjectUtils.writeSourceFile(
+            "$basePath/domain", "$domainPackageName.repositories", "${featureName}Repository.kt",
+            CodeTemplates.repositoryInterface("$domainPackageName.repositories", featureName)
+        )
+
+        ProjectUtils.writeSourceFile(
+            "$basePath/domain", "$domainPackageName.usecases", "${featureName}UseCase.kt",
+            CodeTemplates.useCaseInterface("$domainPackageName.usecases", featureName)
+        )
+
+        // Папка resources пока просто создается пустой
+        File(
+            "$basePath/domain/src/main/java/${
+                domainPackageName.replace(
+                    ".",
+                    "/"
+                )
+            }/resources"
+        ).mkdirs()
+
+
+        // --- 2. СЛОЙ ПРЕДСТАВЛЕНИЯ (PRESENTATION) ---
         val presentationArgs = args.copy(
             moduleName = "${args.moduleName}:presentation",
             packageName = "${args.packageName}.presentation"
         )
-
         val domainAccessor = toTypeSafeAccessor(domainModuleName)
 
         generateAndroidLibrary(
@@ -57,7 +97,7 @@ class TemplateGeneratorImpl {
             predefinedDependencies = listOf(
                 "implementation($domainAccessor)",
                 "implementation(projects.core.essentials)",
-                "implementation(projects.core.essentials)",
+                "implementation(projects.core.theme)" // Если нужен UI (Compose)
             ),
             extraDependencies = listOf(
                 "androidTestImplementation(libs.androidx.junit)",
@@ -81,6 +121,44 @@ class TemplateGeneratorImpl {
         )
 
         ProjectUtils.addToGitIfRequested("$basePath/presentation/src/main/java", args)
+
+
+        // --- 3. ДЕМО СЛОЙ (DEMO) ---
+        println("🚀 Creating demo module for: $featureName...")
+        val demoModuleName = "${args.moduleName}:demo"
+        val demoPackageName = "${args.packageName}.demo"
+        val demoArgs = args.copy(
+            moduleName = demoModuleName,
+            packageName = demoPackageName,
+            // Демо модулю обычно нужен Hilt для DI и, возможно, корутины для delay
+            features = (args.features + "--hilt").filter { it != "--coroutines" }.distinct()
+        )
+
+        generateAndroidLibrary(
+            path = "$basePath/demo",
+            className = null,
+            args = demoArgs,
+            predefinedDependencies = listOf(
+                "implementation($domainAccessor)",
+                "implementation(projects.core.essentials)"
+            )
+        )
+
+        // Генерируем фейковый репозиторий
+        ProjectUtils.writeSourceFile(
+            "$basePath/demo", demoPackageName, "Demo${featureName}Repository.kt",
+            CodeTemplates.demoRepositoryClass(demoPackageName, domainPackageName, featureName)
+        )
+
+        // Генерируем Hilt модуль для подмены репозитория в песочнице
+        ProjectUtils.writeSourceFile(
+            "$basePath/demo", demoPackageName, "${featureName}DemoModule.kt",
+            CodeTemplates.demoHiltModule(demoPackageName, domainPackageName, featureName)
+        )
+
+        ProjectUtils.addToGitIfRequested(basePath, args)
+
+        println("✅ Feature $featureName generated successfully with Domain, Presentation, and Demo modules!")
     }
 
     private fun generateAndroidLibrary(
@@ -157,13 +235,19 @@ class TemplateGeneratorImpl {
         extraDependencies: List<String> = emptyList(),
     ) {
         ProjectUtils.ensureParentBuildFilesExist(path, args)
+        val plugins = mutableListOf(
+            "id(\"java-library\")",
+            "alias(libs.plugins.jetbrains.kotlin.jvm)"
+        )
 
-        val allDeps = predefinedDependencies + listOf("testImplementation(libs.junit)") + extraDependencies
+        if (args.features.contains("--ksp")) plugins.add("alias(libs.plugins.ksp)")
+
+        val allDeps =
+            predefinedDependencies + listOf("testImplementation(libs.junit)") + extraDependencies
 
         val buildGradle = """
             plugins {
-                id("java-library")
-                alias(libs.plugins.jetbrains.kotlin.jvm)
+                ${plugins.joinToString("\n                ")}
             }
             java {
                 sourceCompatibility = JavaVersion.VERSION_17

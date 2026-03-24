@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="sign_up_login">Login</string>
+    <string name="sign_up_password">Password</string>
+    <string name="sign_up_repeat_password">Repeat password</string>
+    <string name="sign_up_first_name">First name</string>
+    <string name="sign_up_last_name">Last name</string>
+    <string name="sign_up_age">Age</string>
+
+    <string name="sign_up_error_login_already_exists">This login already exists</string>
+    <string name="sign_up_error_password_mismatch">Passwords do not match</string>
+
+    <string name="sign_up_error_empty_field">Field \"%1$s\" cannot be empty</string>
+    <string name="sign_up_error_too_short">Field \"%1$s\" is too short (min %2$d characters)</string>
+    <string name="sign_up_error_too_long">Field \"%1$s\" is too long (max %2$d characters)</string>
+    <string name="sign_up_error_invalid_range">Field \"%1$s\" should be in range %2$d..%3$d</string>
+</resources>

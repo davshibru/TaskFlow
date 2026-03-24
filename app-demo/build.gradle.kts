@@ -18,6 +18,10 @@ android {
             dimension = "feature"
             applicationIdSuffix = ".signin"
         }
+        create("signup") {
+            dimension = "feature"
+            applicationIdSuffix = ".signup"
+        }
     }
 
     defaultConfig {
@@ -50,6 +54,8 @@ dependencies {
     "initImplementation"(projects.features.init.demo)
     "signinImplementation"(projects.features.signIn.presentation)
     "signinImplementation"(projects.features.signIn.demo)
+    "signupImplementation"(projects.features.signUp.presentation)
+    "signupImplementation"(projects.features.signUp.demo)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

@@ -45,6 +45,10 @@
             <option value="$PROJECT_DIR$/features/sign-in/demo" />
             <option value="$PROJECT_DIR$/features/sign-in/domain" />
             <option value="$PROJECT_DIR$/features/sign-in/presentation" />
+            <option value="$PROJECT_DIR$/features/sign-up" />
+            <option value="$PROJECT_DIR$/features/sign-up/demo" />
+            <option value="$PROJECT_DIR$/features/sign-up/domain" />
+            <option value="$PROJECT_DIR$/features/sign-up/presentation" />
             <option value="$PROJECT_DIR$/glue" />
             <option value="$PROJECT_DIR$/template" />
             <option value="$PROJECT_DIR$/template/android-library" />
