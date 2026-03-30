@@ -8,4 +8,8 @@ class DemoSignUpRouter @Inject constructor() : SignUpRouter {
     override fun navigateBack() {
         Logger.d("Успешный вход в SignIn")
     }
+
+    override fun launchCongrats() {
+        Logger.d("Успешная регистрация")
+    }
 }

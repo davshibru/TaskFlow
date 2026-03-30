@@ -16,6 +16,7 @@ dependencies {
     implementation(projects.core.presentation)
     implementation(projects.core.navigationDsl)
 
+    implementation(libs.kotlinx.collections.immutable)
 
     implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.androidx.core.ktx)
