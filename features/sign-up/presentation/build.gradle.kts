@@ -15,6 +15,7 @@ dependencies {
     implementation(projects.core.essentials)
     implementation(projects.core.presentation)
     implementation(projects.core.navigationDsl)
+    testImplementation(projects.core.presentationTest)
 
     implementation(libs.kotlinx.collections.immutable)
 
@@ -22,7 +23,6 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
-    testImplementation(libs.junit)
 
     implementation(libs.navigation.compose)
     implementation(libs.hilt.navigation)
