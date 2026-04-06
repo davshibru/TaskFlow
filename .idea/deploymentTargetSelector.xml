@@ -4,7 +4,7 @@
     <selectionStates>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2026-03-23T03:51:50.964764300Z">
+        <DropdownSelection timestamp="2026-04-06T04:33:05.148210300Z">
           <Target type="DEFAULT_BOOT">
             <handle>
               <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\David\.android\avd\Medium_Tablet_API_Baklava.avd" />
@@ -15,10 +15,10 @@
       </SelectionState>
       <SelectionState runConfigName="app-demo">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2026-03-24T08:33:42.962161500Z">
+        <DropdownSelection timestamp="2026-04-06T05:11:08.772268200Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\David\.android\avd\Medium_Tablet_API_Baklava.avd" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\David\.android\avd\Copy_of_CheckInTester_API_30_2.avd" />
             </handle>
           </Target>
         </DropdownSelection>

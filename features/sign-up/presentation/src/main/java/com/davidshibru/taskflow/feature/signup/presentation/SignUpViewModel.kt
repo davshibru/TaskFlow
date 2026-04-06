@@ -39,7 +39,7 @@ class SignUpViewModel @Inject constructor(
     WithInitCallBack,
     WithMviState<SignUpViewModel.StateImpl> {
 
-    private val _stateFlow = MutableStateFlow(StateImpl())
+    private val _stateFlow = MutableStateFlow(StateImpl(stringProvider = stringProvider))
     val stateFlow: StateFlow<Container<State>> =
         combine(_stateFlow, progressStateFlow) { state, inProgress ->
             state.copy(isSignUpInProgress = inProgress)
@@ -145,10 +145,12 @@ class SignUpViewModel @Inject constructor(
     interface State {
         val isSignUpInProgress: Boolean
         val errorMessages: ImmutableMap<InputField<*>, String>
+        val stringProvider: SignUpStringProvider
     }
 
     private data class StateImpl(
         override val isSignUpInProgress: Boolean = false,
+        override val stringProvider: SignUpStringProvider,
         val allErrorMessages: Map<InputField<*>, String> = emptyMap(),
         val fieldsWithEnabledErrors: Set<InputField<*>> = emptySet(),
     ) : State {

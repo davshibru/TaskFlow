@@ -32,6 +32,7 @@ import com.davidshibru.taskflow.core.navigation.dsl.toolbar
 import com.davidshibru.taskflow.core.theme.Dimens
 import com.davidshibru.taskflow.core.theme.components.ContainerView
 import com.davidshibru.taskflow.core.theme.components.ProgressButton
+import com.davidshibru.taskflow.core.theme.previews.PreviewScreenContent
 import com.davidshibru.taskflow.core.theme.previews.ScreenPreview
 import com.davidshibru.taskflow.features.signin.domain.entities.Credentials
 import com.davidshibru.taskflow.features.signin.domain.entities.InputField
@@ -155,7 +156,7 @@ private fun BoxScope.SignInContent(
 
 @ScreenPreview
 @Composable
-private fun SignInContentPreview() {
+private fun SignInContentPreview()  = PreviewScreenContent {
     Box(Modifier.fillMaxSize()) {
         SignInContent(
             state = SignInViewModel.State(),

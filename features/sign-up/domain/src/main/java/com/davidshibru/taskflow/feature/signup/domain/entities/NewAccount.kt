@@ -7,7 +7,12 @@ data class NewAccount(
     val firstName: String,
     val lastName: String,
     val age: Int,
-)
+) {
+
+    companion object {
+        const val EMPTY_AGE = -1
+    }
+}
 
 fun NewAccount.toFieldValues(): List<InputFieldValue<*>> {
     return listOf(

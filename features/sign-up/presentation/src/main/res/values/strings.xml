@@ -14,4 +14,7 @@
     <string name="sign_up_error_too_short">Field \"%1$s\" is too short (min %2$d characters)</string>
     <string name="sign_up_error_too_long">Field \"%1$s\" is too long (max %2$d characters)</string>
     <string name="sign_up_error_invalid_range">Field \"%1$s\" should be in range %2$d..%3$d</string>
+    <string name="sign_up_terms_and_conditions">Terms and conditions</string>
+    <string name="sign_up_privacy_policy">Privacy policy</string>
+    <string name="sign_up_create_account">Create Account</string>
 </resources>
