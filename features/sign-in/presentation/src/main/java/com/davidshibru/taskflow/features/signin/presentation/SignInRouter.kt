@@ -4,4 +4,5 @@ interface SignInRouter {
     fun launchTermsAndConditions()
     fun launchPrivacyPolicy()
     fun launchMain()
+    fun launchSignUp()
 }

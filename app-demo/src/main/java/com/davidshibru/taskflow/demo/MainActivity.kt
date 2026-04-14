@@ -14,11 +14,14 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var exceptionHandler: AndroidExceptionHandler
 
+    @Inject
+    lateinit var demoNavigator: DemoNavigator
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            DemoScreen()
+            DemoScreen(demoNavigator)
             exceptionHandler.ErrorDialog()
         }
     }

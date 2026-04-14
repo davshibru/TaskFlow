@@ -48,6 +48,24 @@ sealed class Container<out T> {
 
     fun loadingContainer() : Loading = Loading
 
+    companion object {
+        fun <T> success(
+            value: T,
+            reloadAction: ReloadAction = {},
+        ) : Success<T> {
+            return Success(value, reloadAction)
+        }
+
+        fun error(
+            exception: Exception,
+            reloadAction: ReloadAction = {},
+        ) : Error {
+            return Error(exception, reloadAction)
+        }
+
+        fun loading() : Loading = Loading
+    }
+
     fun unwrap(): T {
         return when (this) {
             is Success -> value
@@ -77,6 +95,13 @@ fun <T, R> Container<T>.map(mapper: (T) -> R): Container<R> {
     )
 }
 
+fun <T, R> Container.Completed<T>.map(mapper: (T) -> R): Container.Completed<R> {
+    return when(this) {
+        is Container.Error -> { Container.Error(this.exception, reloadAction) }
+        is Container.Success<T> -> { Container.Success(mapper(value), reloadAction) }
+    }
+}
+
 /**
  * Maps the exception of the container if it matches the [exceptionClass].
  */
@@ -87,6 +112,7 @@ inline fun <T, E : Exception> Container<T>.mapException(
     val current = this
     return if (current is Container.Error && exceptionClass.isInstance(current.exception)) {
         try {
+            @Suppress("UNCHECKED_CAST")
             val mappedException = mapper(current.exception as E)
             Container.Error(mappedException, current.reloadAction)
         } catch (e: Exception) {
@@ -95,6 +121,30 @@ inline fun <T, E : Exception> Container<T>.mapException(
     } else {
         this
     }
+}
+
+inline fun <T, E : Exception> Container.Completed<T>.catch(
+    exceptionClass: KClass<E>,
+    crossinline mapper: (E) -> Container.Completed<T>
+): Container.Completed<T> {
+    val current = this
+
+    return if (current is Container.Error && exceptionClass.isInstance(current.exception)) {
+        try {
+            @Suppress("UNCHECKED_CAST")
+            mapper(current.exception as E)
+        } catch (e: Exception) {
+            Container.Error(e, current.reloadAction)
+        }
+    } else {
+        this
+    }
+}
+
+inline fun <T, reified E : Exception> Container.Completed<T>.catch(
+    crossinline mapper: (E) -> Container.Completed<T>
+): Container.Completed<T> {
+    return catch(E::class, mapper)
 }
 
 fun <T, R> Flow<Container<T>>.containerMap(mapper: (T) -> R): Flow<Container<R>> {

@@ -1,4 +1,4 @@
-package com.davidshibru.taskflow.core.navigation.base
+package com.davidshibru.taskflow.core.navigation.base.impl
 
 import android.content.Context
 import androidx.compose.runtime.Composable
@@ -8,6 +8,7 @@ import androidx.compose.runtime.setValue
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.toRoute
 import com.davidshibru.taskflow.core.navigation.Route
+import com.davidshibru.taskflow.core.navigation.base.ExtendedNavStore
 import com.davidshibru.taskflow.core.navigation.dsl.ConfiguredScreen
 import com.davidshibru.taskflow.core.navigation.dsl.ScreenScope
 import com.davidshibru.taskflow.core.navigation.dsl.ScreenToolbar
@@ -58,16 +59,8 @@ class ExtendedNavStoreImpl(
     }
 
     private fun createScreen(navEntry: NavBackStackEntry): Screen {
-        val routeString = requireNotNull(navEntry.destination.route)
-        val className = if (routeString.contains("/")) {
-            routeString.substringBefore("/")
-        } else {
-            routeString.substringBefore("?")
-        }
-
-        val routeClass = Class.forName(className).kotlin
+        val routeClass = navEntry.getRouteClass()
         val route = navEntry.toRoute<Route>(routeClass)
-
         return createScreen(route)
     }
 

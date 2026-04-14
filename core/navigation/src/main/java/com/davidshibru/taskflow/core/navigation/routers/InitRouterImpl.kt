@@ -10,6 +10,6 @@ class InitRouterImpl @Inject constructor(
 ) : InitRouter {
 
     override fun launchSignIn() {
-        appNavigator.launch(SignInRoute)
+        appNavigator.restart(SignInRoute)
     }
 }

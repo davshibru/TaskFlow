@@ -1,15 +1,16 @@
 package com.davidshibru.taskflow.demo
 
-import com.davidshibru.taskflow.core.essentials.logger.Logger
 import com.davidshibru.taskflow.feature.signup.presentation.SignUpRouter
 import javax.inject.Inject
 
-class DemoSignUpRouter @Inject constructor() : SignUpRouter {
-    override fun navigateBack() {
-        Logger.d("Успешный вход в SignIn")
+class DemoSignUpRouter @Inject constructor(
+    private val demoNavigator: DemoNavigator,
+) : SignUpRouter {
+    override fun launchCongrats() {
+        demoNavigator.launch(CongratsDemoRoute)
     }
 
-    override fun launchCongrats() {
-        Logger.d("Успешная регистрация")
+    override fun goBackToSignIn() {
+        demoNavigator.goBack()
     }
 }

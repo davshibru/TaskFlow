@@ -22,8 +22,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.davidshibru.taskflow.core.essentials.container.Container
 import com.davidshibru.taskflow.core.essentials.logger.Logger
@@ -77,7 +84,8 @@ fun ScreenScope.signInScreen() {
             SignInContent(
                 state = state,
                 onSignInAction = viewModel::signIn,
-                onClearErrorMessage = viewModel::clearErrorMessages
+                onClearErrorMessage = viewModel::clearErrorMessages,
+                onLaunchSignUpAction = viewModel::onLaunchSignUp
             )
         }
     }
@@ -88,6 +96,7 @@ fun ScreenScope.signInScreen() {
 private fun BoxScope.SignInContent(
     state: SignInViewModel.State,
     onSignInAction: (Credentials) -> Unit,
+    onLaunchSignUpAction: () -> Unit,
     onClearErrorMessage: () -> Unit,
 ) {
     var login by rememberSaveable { mutableStateOf("") }
@@ -151,6 +160,33 @@ private fun BoxScope.SignInContent(
             isInProgress = state.isLoginInProgress,
             onClick = { onSignInAction(Credentials(login, password)) }
         )
+
+        val signUpSuggestion = buildAnnotatedString {
+            append(stringResource(R.string.sign_in_don_t_have_an_account))
+            appendLine()
+            val startPosition = length
+            append(stringResource(R.string.sign_in_create_it))
+            val endPosition = length
+            addLink(
+                clickable = LinkAnnotation.Clickable(
+                    tag = "sign-up",
+                    styles = TextLinkStyles(
+                        style = SpanStyle(
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Bold,
+                            textDecoration = TextDecoration.Underline,
+                        ),
+                    ),
+                    linkInteractionListener = { onLaunchSignUpAction.invoke() }
+                ),
+                start = startPosition,
+                end = endPosition,
+            )
+        }
+        Text(
+            text = signUpSuggestion,
+            textAlign = TextAlign.Center,
+        )
     }
 }
 
@@ -161,7 +197,8 @@ private fun SignInContentPreview()  = PreviewScreenContent {
         SignInContent(
             state = SignInViewModel.State(),
             onSignInAction = {},
-            onClearErrorMessage = {}
+            onClearErrorMessage = {},
+            onLaunchSignUpAction = {},
         )
     }
 }

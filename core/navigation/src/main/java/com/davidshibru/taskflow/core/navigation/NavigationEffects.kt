@@ -8,6 +8,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavHostController
 import com.davidshibru.taskflow.core.navigation.base.AppNavigator
 import com.davidshibru.taskflow.core.navigation.base.NavigationIntent
+import com.davidshibru.taskflow.core.navigation.base.impl.getRouteClass
 
 @Composable
 fun NavigationEffects(
@@ -26,6 +27,15 @@ fun NavigationEffects(
                     is NavigationIntent.Restart -> {
                         navHostController.navigate(intent.route) {
                             popUpTo(navHostController.graph.id) { inclusive = true }
+                        }
+                    }
+                    is NavigationIntent.Replace -> {
+                        navHostController.currentBackStackEntry?.getRouteClass()?.let { currentRouteClass ->
+                            navHostController.navigate(intent.route) {
+                                popUpTo(currentRouteClass) {
+                                    inclusive = true
+                                }
+                            }
                         }
                     }
                     is NavigationIntent.GoBack -> {

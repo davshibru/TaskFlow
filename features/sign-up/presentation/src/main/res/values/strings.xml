@@ -17,4 +17,7 @@
     <string name="sign_up_terms_and_conditions">Terms and conditions</string>
     <string name="sign_up_privacy_policy">Privacy policy</string>
     <string name="sign_up_create_account">Create Account</string>
+    <string name="sign_up_congratulations">Congratulations! \nYou\'ve successfully created new account</string>
+    <string name="sign_up_go_to_login">Go to Login</string>
+    <string name="sign_up_congratilations_title">Congratilations</string>
 </resources>

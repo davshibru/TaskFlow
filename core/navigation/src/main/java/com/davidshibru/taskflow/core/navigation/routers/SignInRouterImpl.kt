@@ -2,6 +2,7 @@ package com.davidshibru.taskflow.core.navigation.routers
 
 import android.content.Context
 import android.widget.Toast
+import com.davidshibru.taskflow.core.navigation.SignUpRoute
 import com.davidshibru.taskflow.core.navigation.base.AppNavigator
 import com.davidshibru.taskflow.features.signin.presentation.SignInRouter
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -26,5 +27,7 @@ class SignInRouterImpl @Inject constructor(
 
     }
 
-
+    override fun launchSignUp() {
+        appNavigator.launch(SignUpRoute)
+    }
 }

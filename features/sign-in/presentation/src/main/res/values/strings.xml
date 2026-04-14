@@ -7,4 +7,6 @@
     <string name="login">Login</string>
     <string name="password">Password</string>
     <string name="empty_field_error">%1$s is empty</string>
+    <string name="sign_in_don_t_have_an_account">Don\'t have an account?</string>
+    <string name="sign_in_create_it">Create it!</string>
 </resources>

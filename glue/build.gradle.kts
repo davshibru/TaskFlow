@@ -6,8 +6,9 @@ android {
     namespace = "com.davidshibru.taskflow.glue"
 }
 dependencies {
-    implementation(projects.features.signIn.domain)
     implementation(projects.features.init.domain)
+    implementation(projects.features.signIn.domain)
+    implementation(projects.features.signUp.domain)
 
     implementation(projects.data)
 

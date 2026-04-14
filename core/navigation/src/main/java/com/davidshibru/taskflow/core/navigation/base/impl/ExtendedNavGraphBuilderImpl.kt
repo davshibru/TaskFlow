@@ -1,9 +1,11 @@
-package com.davidshibru.taskflow.core.navigation.base
+package com.davidshibru.taskflow.core.navigation.base.impl
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.davidshibru.taskflow.core.navigation.Route
+import com.davidshibru.taskflow.core.navigation.base.ExtendedNavGraphBuilder
+import com.davidshibru.taskflow.core.navigation.base.ExtendedNavStore
 import com.davidshibru.taskflow.core.navigation.dsl.ScreenScope
 import kotlin.reflect.KClass
 

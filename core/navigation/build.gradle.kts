@@ -10,6 +10,7 @@ android {
 dependencies {
     implementation(projects.features.init.presentation)
     implementation(projects.features.signIn.presentation)
+    implementation(projects.features.signUp.presentation)
 
     implementation(projects.core.navigationDsl)
 

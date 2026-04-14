@@ -18,8 +18,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.davidshibru.taskflow.core.navigation.base.AppNavigator
 import com.davidshibru.taskflow.core.navigation.base.ExtendedNavGraphBuilder
-import com.davidshibru.taskflow.core.navigation.base.ExtendedNavGraphBuilderImpl
-import com.davidshibru.taskflow.core.navigation.base.ExtendedNavStoreImpl
+import com.davidshibru.taskflow.core.navigation.base.impl.ExtendedNavGraphBuilderImpl
+import com.davidshibru.taskflow.core.navigation.base.impl.ExtendedNavStoreImpl
 import com.davidshibru.taskflow.core.navigation.dsl.ScreenToolbar
 
 @OptIn(ExperimentalMaterial3Api::class)

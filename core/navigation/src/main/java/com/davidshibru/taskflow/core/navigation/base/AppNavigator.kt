@@ -8,5 +8,6 @@ interface AppNavigator {
 
     fun launch(route: Route)
     fun restart(route: Route)
+    fun replace(route: Route)
     fun goBack()
 }

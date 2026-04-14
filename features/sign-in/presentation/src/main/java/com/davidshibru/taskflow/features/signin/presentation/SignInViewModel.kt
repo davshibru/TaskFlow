@@ -27,6 +27,8 @@ class SignInViewModel @Inject constructor(
         state.copy(isLoginInProgress = inProgress)
     }.asContainerStateFlow(viewModelScope)
 
+    fun onLaunchSignUp() = router.launchSignUp()
+
 
     fun signIn(credentials: Credentials) = launch {
         try {
