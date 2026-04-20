@@ -1,3 +1,5 @@
 package com.davidshibru.taskflow.demo
 
-interface DemoRoute
+import androidx.navigation3.runtime.NavKey
+
+interface DemoRoute : NavKey

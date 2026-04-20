@@ -21,5 +21,8 @@ dependencies {
 
     implementation(libs.navigation.compose)
     implementation(libs.hilt.navigation)
+    implementation(libs.androidx.navigation3.ui)
+    implementation(libs.androidx.lifecycle.viewmodel.navigation3)
+
     implementation(libs.androidx.compose.material.icons.extended)
 }

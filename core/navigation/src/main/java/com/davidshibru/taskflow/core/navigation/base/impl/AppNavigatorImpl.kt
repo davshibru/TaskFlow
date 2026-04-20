@@ -28,7 +28,6 @@ class AppNavigatorImpl @Inject constructor() : AppNavigator {
 
     override fun goBack() {
         _navigationEvents.trySend(NavigationIntent.GoBack)
-
     }
 
 }

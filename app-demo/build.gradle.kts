@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.convention.android.application)
     alias(libs.plugins.convention.compose)
     alias(libs.plugins.convention.hilt)
+    alias(libs.plugins.convention.serialization)
 }
 
 android {
@@ -38,6 +39,9 @@ dependencies {
 
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.navigation3.ui)
+    implementation(libs.androidx.lifecycle.viewmodel.navigation3)
+    implementation(libs.hilt.navigation)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)

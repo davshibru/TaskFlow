@@ -1,207 +1,229 @@
 package com.davidshibru.taskflow.demo
 
 import android.content.Context
-import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import com.davidshibru.taskflow.core.navigation.dsl.ConfiguredScreen
-import com.davidshibru.taskflow.core.essentials.logger.Logger
+import androidx.hilt.lifecycle.viewmodel.HiltViewModelFactory
+import androidx.lifecycle.HasDefaultViewModelProviderFactory
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+import androidx.navigation3.runtime.EntryProviderScope
+import androidx.navigation3.runtime.NavBackStack
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
+import androidx.navigation3.ui.NavDisplay
 import com.davidshibru.taskflow.core.navigation.dsl.ScreenScope
 import com.davidshibru.taskflow.core.navigation.dsl.ScreenToolbar
+import dagger.hilt.android.lifecycle.withCreationCallback
+import kotlinx.coroutines.CoroutineScope
 import kotlin.reflect.KClass
 
-@Composable
-fun ProvideDemoScreen(
-    builder: ScreenScope.() -> Unit
-) {
-    val context = LocalContext.current
-
-    val screenScope = remember(context) {
-        object : ScreenScope {
-            override val context: Context = context
-            override var toolbar: ScreenToolbar by mutableStateOf(ScreenToolbar.Hidden)
-
-            private var screenContent: @Composable () -> Unit = {}
-
-            override fun content(block: @Composable (() -> Unit)) {
-                this.screenContent = block
-            }
-
-            @Composable
-            fun Render() {
-                Scaffold(
-                    topBar = {
-                        val currentToolbar = toolbar
-                        if (currentToolbar is ScreenToolbar.Default) {
-                            DemoAppToolBar(
-                                toolbar = currentToolbar,
-                                showBackButton = false,
-                                onBackPressed = {
-                                    Logger.d("🔙 Нажата кнопка Назад в Тулбаре")
-                                }
-                            )
-                        }
-                    }
-                ) { paddingValues ->
-                    Box(modifier = Modifier.padding(paddingValues)) {
-                        screenContent()
-                    }
-                }
-            }
-        }
-    }
-
-    screenScope.builder()
-
-    screenScope.Render()
-}
-
+@Suppress("UNCHECKED_CAST")
 @Composable
 fun ProvideDemoNavigation(
     navigator: DemoNavigator,
     startDestination: DemoRoute,
     builder: DemoNavGraphBuilder.() -> Unit,
 ) {
-    val context = LocalContext.current
-    val navStore = remember(context) { DemoNavStore(context) }
-    val navGraphBuilder = remember(navStore) { DemoNavGraphBuilderImpl(navStore) }
+    val backStack = rememberNavBackStack(startDestination) as NavBackStack<DemoRoute>
 
-    navGraphBuilder.builder()
+    DemoNavigationEffects(
+        navigationChannel = navigator,
+        backStack = backStack,
+    )
 
-    LaunchedEffect(navigator, startDestination) {
-        navigator.setStartDestination(startDestination)
+    Surface(
+        modifier = Modifier.background(MaterialTheme.colorScheme.background),
+    ) {
+        NavDisplay(
+            backStack = backStack,
+            entryDecorators = listOf(
+                rememberSaveableStateHolderNavEntryDecorator(),
+                rememberViewModelStoreNavEntryDecorator(),
+            ),
+            entryProvider = entryProvider {
+                DemoNavGraphBuilderImpl(
+                    backStack = backStack,
+                    origin = this,
+                ).apply(builder)
+            },
+        )
     }
+}
 
-    val backStack by navigator.backStack.collectAsState()
-    val currentEntry = backStack.lastOrNull()
-    val showBackButton = backStack.size > 1
+@Composable
+private fun DemoNavigationEffects(
+    navigationChannel: DemoNavigator,
+    backStack: NavBackStack<DemoRoute>,
+) {
+    val lifecycleOwner = LocalLifecycleOwner.current
 
-    LaunchedEffect(backStack) {
-        navStore.onBackStackChanged(backStack)
-    }
-
-    BackHandler(enabled = showBackButton) {
-        navigator.goBack()
-    }
-
-    Scaffold(
-        topBar = {
-            val toolbar = navStore.screen.toolbar
-            if (toolbar is ScreenToolbar.Default) {
-                DemoAppToolBar(
-                    toolbar = toolbar,
-                    showBackButton = showBackButton,
-                    onBackPressed = navigator::goBack,
-                )
-            }
-        }
-    ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-        ) {
-            if (currentEntry != null) {
-                navStore.Content(currentEntry)
+    LaunchedEffect(navigationChannel, lifecycleOwner) {
+        lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            navigationChannel.navigationEvents.collect { intent ->
+                when (intent) {
+                    is DemoNavigationIntent.NavigateTo -> {
+                        backStack.add(intent.route)
+                    }
+                    is DemoNavigationIntent.Restart -> {
+                        backStack.clear()
+                        backStack.add(intent.route)
+                    }
+                    is DemoNavigationIntent.Replace -> {
+                        backStack.removeLastOrNull()
+                        backStack.add(intent.route)
+                    }
+                    DemoNavigationIntent.GoBack -> {
+                        backStack.removeLastOrNull()
+                    }
+                }
             }
         }
     }
 }
 
 private class DemoNavGraphBuilderImpl(
-    private val navStore: DemoNavStore,
+    private val backStack: NavBackStack<DemoRoute>,
+    private val origin: EntryProviderScope<DemoRoute>,
 ) : DemoNavGraphBuilder {
 
     override fun <T : DemoRoute> composable(
         routeClass: KClass<T>,
         content: ScreenScope.(T) -> Unit,
     ) {
-        navStore.registerConfiguration(routeClass, content)
+        origin.addEntryProvider(
+            clazz = routeClass,
+            content = { route ->
+                val context = LocalContext.current
+                val coroutineScope = rememberCoroutineScope()
+
+                val viewModelStoreOwner = requireNotNull(LocalViewModelStoreOwner.current)
+                viewModelStoreOwner as HasDefaultViewModelProviderFactory
+
+                val screenScope = remember(
+                    context,
+                    coroutineScope,
+                    viewModelStoreOwner,
+                    route,
+                ) {
+                    DemoNav3ScreenScope(
+                        context = context,
+                        coroutineScope = coroutineScope,
+                        viewModelStoreOwner = viewModelStoreOwner,
+                        defaultsProvider = viewModelStoreOwner,
+                    ).apply {
+                        content(this, route)
+                    }
+                }
+
+                DemoScreenScaffold(
+                    toolbar = screenScope.toolbar,
+                    showBackButton = backStack.indexOf(route) != 0,
+                    onBackPressed = { backStack.removeLastOrNull() },
+                ) {
+                    screenScope.Content()
+                }
+            },
+        )
     }
 }
 
-private class DemoNavStore(
-    private val context: Context,
+@Composable
+private fun DemoScreenScaffold(
+    toolbar: ScreenToolbar,
+    showBackButton: Boolean,
+    modifier: Modifier = Modifier,
+    onBackPressed: () -> Unit,
+    content: @Composable () -> Unit,
 ) {
-
-    private val configurations = mutableMapOf<KClass<out DemoRoute>, Configuration<*>>()
-    private var screens = mutableMapOf<String, Screen>()
-    var screen: ConfiguredScreen by mutableStateOf(ConfiguredScreen.Empty)
-        private set
-
-    fun onBackStackChanged(backStack: List<DemoBackStackEntry>) {
-        screens = backStack.associateBy(DemoBackStackEntry::id)
-            .mapValues { (_, entry) ->
-                screens[entry.id] ?: createScreen(entry.route)
+    Scaffold(
+        modifier = modifier,
+        topBar = {
+            if (toolbar is ScreenToolbar.Default) {
+                DemoAppToolBar(
+                    toolbar = toolbar,
+                    showBackButton = showBackButton,
+                    onBackPressed = onBackPressed,
+                )
             }
-            .toMutableMap()
-
-        screen = backStack
-            .lastOrNull()
-            ?.let { entry -> screens[entry.id] }
-            ?: ConfiguredScreen.Empty
+        },
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues),
+        ) {
+            content()
+        }
     }
+}
 
-    fun <T : DemoRoute> registerConfiguration(
-        routeClass: KClass<T>,
-        content: ScreenScope.(T) -> Unit,
-    ) {
-        configurations[routeClass] = Configuration(content)
+private class DemoNav3ScreenScope(
+    override val context: Context,
+    override val coroutineScope: CoroutineScope,
+    private val viewModelStoreOwner: ViewModelStoreOwner,
+    private val defaultsProvider: HasDefaultViewModelProviderFactory,
+) : ScreenScope,
+    ViewModelStoreOwner by viewModelStoreOwner,
+    HasDefaultViewModelProviderFactory by defaultsProvider {
+
+    override var toolbar: ScreenToolbar by mutableStateOf(ScreenToolbar.Hidden)
+
+    private var content: @Composable () -> Unit by mutableStateOf({})
+
+    override fun content(block: @Composable () -> Unit) {
+        content = block
     }
 
     @Composable
-    fun Content(entry: DemoBackStackEntry) {
-        val screen = screens.getOrPut(entry.id) {
-            createScreen(entry.route)
-        }
-
-        screen.ScreenContent()
+    fun Content() {
+        content()
     }
 
-    @Suppress("UNCHECKED_CAST")
-    private fun <T : DemoRoute> createScreen(route: T): Screen {
-        val screen = Screen(context)
-        val configuration = requireNotNull(configurations[route::class]) {
-            "Demo route is not registered: ${route::class.qualifiedName}"
-        } as Configuration<T>
-
-        configuration.applyTo(screen, route)
-        return screen
+    override fun <T : ViewModel> viewModel(vmClass: KClass<T>): T {
+        return getViewModel<T, Nothing>(vmClass)
     }
 
-    private class Configuration<T : DemoRoute>(
-        private val content: ScreenScope.(T) -> Unit,
-    ) {
-        fun applyTo(screenScope: ScreenScope, route: T) {
-            screenScope.content(route)
-        }
+    override fun <T : ViewModel, F> viewModel(
+        vmClass: KClass<T>,
+        callback: F.() -> T,
+    ): T {
+        return getViewModel(vmClass, callback)
     }
 
-    private class Screen(
-        override val context: Context,
-    ) : ScreenScope {
-        override var toolbar: ScreenToolbar by mutableStateOf(ScreenToolbar.Hidden)
-
-        private var content: @Composable () -> Unit by mutableStateOf({})
-
-        override fun content(block: @Composable () -> Unit) {
-            content = block
+    private fun <T : ViewModel, F> getViewModel(
+        vmClass: KClass<T>,
+        callback: (F.() -> T)? = null,
+    ): T {
+        val factory = HiltViewModelFactory(context, defaultViewModelProviderFactory)
+        val extras = defaultViewModelCreationExtras
+        val finalExtras = if (callback == null) {
+            extras
+        } else {
+            extras.withCreationCallback(callback)
         }
-
-        @Composable
-        fun ScreenContent() {
-            content()
-        }
+        val provider = ViewModelProvider.create(viewModelStoreOwner, factory, finalExtras)
+        return provider[vmClass]
     }
 }

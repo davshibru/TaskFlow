@@ -1,65 +1,38 @@
 package com.davidshibru.taskflow.demo
 
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.update
-import java.util.concurrent.atomic.AtomicInteger
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 import javax.inject.Singleton
 
-data class DemoBackStackEntry(
-    val id: String,
-    val route: DemoRoute,
-)
+sealed interface DemoNavigationIntent {
+    data class NavigateTo(val route: DemoRoute) : DemoNavigationIntent
+    data class Restart(val route: DemoRoute) : DemoNavigationIntent
+    data class Replace(val route: DemoRoute) : DemoNavigationIntent
+    data object GoBack : DemoNavigationIntent
+}
 
 @Singleton
 class DemoNavigator @Inject constructor() {
 
-    private val nextEntryId = AtomicInteger()
-    private val _backStack = MutableStateFlow<List<DemoBackStackEntry>>(emptyList())
+    private val _navigationEvents = Channel<DemoNavigationIntent>(Channel.Factory.BUFFERED)
 
-    val backStack: StateFlow<List<DemoBackStackEntry>> = _backStack
-
-    fun setStartDestination(route: DemoRoute) {
-        _backStack.update { backStack ->
-            backStack.ifEmpty { listOf(createEntry(route)) }
-        }
-    }
+    val navigationEvents: Flow<DemoNavigationIntent> = _navigationEvents.receiveAsFlow()
 
     fun launch(route: DemoRoute) {
-        _backStack.update { backStack ->
-            backStack + createEntry(route)
-        }
+        _navigationEvents.trySend(DemoNavigationIntent.NavigateTo(route))
     }
 
     fun replace(route: DemoRoute) {
-        _backStack.update { backStack ->
-            if (backStack.isEmpty()) {
-                listOf(createEntry(route))
-            } else {
-                backStack.dropLast(1) + createEntry(route)
-            }
-        }
+        _navigationEvents.trySend(DemoNavigationIntent.Replace(route))
     }
 
     fun restart(route: DemoRoute) {
-        _backStack.value = listOf(createEntry(route))
+        _navigationEvents.trySend(DemoNavigationIntent.Restart(route))
     }
 
     fun goBack() {
-        _backStack.update { backStack ->
-            if (backStack.size > 1) {
-                backStack.dropLast(1)
-            } else {
-                backStack
-            }
-        }
-    }
-
-    private fun createEntry(route: DemoRoute): DemoBackStackEntry {
-        return DemoBackStackEntry(
-            id = nextEntryId.getAndIncrement().toString(),
-            route = route,
-        )
+        _navigationEvents.trySend(DemoNavigationIntent.GoBack)
     }
 }

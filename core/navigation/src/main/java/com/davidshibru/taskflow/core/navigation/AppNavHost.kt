@@ -1,27 +1,22 @@
 package com.davidshibru.taskflow.core.navigation
 
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.background
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.navigation.compose.ComposeNavigator
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.rememberNavController
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+import androidx.navigation3.runtime.NavBackStack
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
+import androidx.navigation3.ui.NavDisplay
 import com.davidshibru.taskflow.core.navigation.base.AppNavigator
 import com.davidshibru.taskflow.core.navigation.base.ExtendedNavGraphBuilder
 import com.davidshibru.taskflow.core.navigation.base.impl.ExtendedNavGraphBuilderImpl
-import com.davidshibru.taskflow.core.navigation.base.impl.ExtendedNavStoreImpl
-import com.davidshibru.taskflow.core.navigation.dsl.ScreenToolbar
 
+@Suppress("UNCHECKED_CAST")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppNavHost(
@@ -30,55 +25,31 @@ fun AppNavHost(
     startDestination: Route = InitRoute,
     navGraphBuilder: ExtendedNavGraphBuilder.() -> Unit = {},
 ) {
-    val navController = rememberNavController()
-    val context = LocalContext.current
-    val navStore = remember { ExtendedNavStoreImpl(context) }
+
+    val backStack = rememberNavBackStack(startDestination)
+            as NavBackStack<Route>
 
     NavigationEffects(
         navigationChannel = appNavigator,
-        navHostController = navController,
+        backStack = backStack,
     )
-    var showBackButton by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        val navigator = navController.navigatorProvider
-            .getNavigator(ComposeNavigator::class.java)
-
-        navigator.backStack.collect { backStack ->
-            navStore.onBackStackChanged(backStack)
-            showBackButton = backStack.size > 1
-        }
-    }
-
-    Scaffold(
-        modifier = modifier,
-        topBar = {
-            val toolbar = navStore.screen.toolbar
-            if (toolbar is ScreenToolbar.Default) {
-                AppToolBar(
-                    toolbar = toolbar,
-                    showBackButton = showBackButton,
-                    onBackPressed = {
-                        navController.navigateUp()
-                    }
-                )
+    Surface(
+        modifier = Modifier.background(MaterialTheme.colorScheme.background)
+    ) {
+        NavDisplay(
+            backStack = backStack,
+            modifier = modifier,
+            entryDecorators = listOf(
+                rememberSaveableStateHolderNavEntryDecorator(),
+                rememberViewModelStoreNavEntryDecorator(),
+            ),
+            entryProvider = entryProvider {
+                ExtendedNavGraphBuilderImpl(origin = this, backStack = backStack).apply {
+                    buildAppNavGraph()
+                    navGraphBuilder()
+                }
             }
-        }
-    ) { paddingValues ->
-
-        val topPadding = animateDpAsState(paddingValues.calculateTopPadding())
-
-        NavHost(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(topPadding.value),
-            navController = navController,
-            startDestination = startDestination,
-        ) {
-            with(ExtendedNavGraphBuilderImpl(this, navStore)) {
-                buildAppNavGraph()
-                navGraphBuilder()
-            }
-        }
+        )
     }
 }

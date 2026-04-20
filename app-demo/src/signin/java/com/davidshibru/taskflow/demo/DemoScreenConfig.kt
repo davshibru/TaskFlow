@@ -3,7 +3,9 @@ package com.davidshibru.taskflow.demo
 import androidx.compose.runtime.Composable
 
 import com.davidshibru.taskflow.features.signin.presentation.signInScreen
+import kotlinx.serialization.Serializable
 
+@Serializable
 private data object SignInDemoRoute : DemoRoute
 
 @Composable

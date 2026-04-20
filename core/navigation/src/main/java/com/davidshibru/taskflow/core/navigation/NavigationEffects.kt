@@ -5,15 +5,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.NavHostController
+import androidx.navigation3.runtime.NavBackStack
 import com.davidshibru.taskflow.core.navigation.base.AppNavigator
 import com.davidshibru.taskflow.core.navigation.base.NavigationIntent
-import com.davidshibru.taskflow.core.navigation.base.impl.getRouteClass
 
 @Composable
 fun NavigationEffects(
     navigationChannel: AppNavigator,
-    navHostController: NavHostController,
+    backStack: NavBackStack<Route>,
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
 
@@ -22,24 +21,18 @@ fun NavigationEffects(
             navigationChannel.navigationEvents.collect { intent ->
                 when (intent) {
                     is NavigationIntent.NavigateTo -> {
-                        navHostController.navigate(intent.route)
+                        backStack.add(intent.route)
                     }
                     is NavigationIntent.Restart -> {
-                        navHostController.navigate(intent.route) {
-                            popUpTo(navHostController.graph.id) { inclusive = true }
-                        }
+                        backStack.clear()
+                        backStack.add(intent.route)
                     }
                     is NavigationIntent.Replace -> {
-                        navHostController.currentBackStackEntry?.getRouteClass()?.let { currentRouteClass ->
-                            navHostController.navigate(intent.route) {
-                                popUpTo(currentRouteClass) {
-                                    inclusive = true
-                                }
-                            }
-                        }
+                        backStack.removeLastOrNull()
+                        backStack.add(intent.route)
                     }
                     is NavigationIntent.GoBack -> {
-                        navHostController.navigateUp()
+                        backStack.removeLastOrNull()
                     }
                 }
             }
