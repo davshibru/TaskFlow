@@ -1,7 +1,9 @@
 package com.davidshibru.taskflow.core.common.android.di
 
+import com.davidshibru.taskflow.core.common.android.DateTimeProviderImpl
 import com.davidshibru.taskflow.core.common.android.logger.AndroidLogger
 import com.davidshibru.taskflow.core.common.android.resources.CoreStringProviderImpl
+import com.davidshibru.taskflow.core.essentials.datetime.DateTimeProvider
 import com.davidshibru.taskflow.core.essentials.exception.mapper.DefaultExceptionToMessageMapper
 import com.davidshibru.taskflow.core.essentials.exception.mapper.ExceptionToMessageMapper
 import com.davidshibru.taskflow.core.essentials.logger.Logger
@@ -16,7 +18,7 @@ import dagger.multibindings.IntoMap
 
 @Module
 @InstallIn(SingletonComponent::class)
-interface CommonAndroidModule {
+internal interface CommonAndroidModule {
 
     @Binds
     fun bindLogger(
@@ -35,4 +37,7 @@ interface CommonAndroidModule {
     fun bindExceptionToMessageMapper(
         impl: DefaultExceptionToMessageMapper
     ): ExceptionToMessageMapper
+
+    @Binds
+    fun bindDateTimeProvider(impl: DateTimeProviderImpl): DateTimeProvider
 }

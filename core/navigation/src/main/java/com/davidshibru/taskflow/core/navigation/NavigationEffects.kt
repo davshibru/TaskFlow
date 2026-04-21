@@ -23,14 +23,17 @@ fun NavigationEffects(
                     is NavigationIntent.NavigateTo -> {
                         backStack.add(intent.route)
                     }
+
                     is NavigationIntent.Restart -> {
                         backStack.clear()
                         backStack.add(intent.route)
                     }
+
                     is NavigationIntent.Replace -> {
                         backStack.removeLastOrNull()
                         backStack.add(intent.route)
                     }
+
                     is NavigationIntent.GoBack -> {
                         backStack.removeLastOrNull()
                     }
