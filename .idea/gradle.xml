@@ -38,6 +38,10 @@
             <option value="$PROJECT_DIR$/core/theme" />
             <option value="$PROJECT_DIR$/data" />
             <option value="$PROJECT_DIR$/features" />
+            <option value="$PROJECT_DIR$/features/chats" />
+            <option value="$PROJECT_DIR$/features/chats/demo" />
+            <option value="$PROJECT_DIR$/features/chats/domain" />
+            <option value="$PROJECT_DIR$/features/chats/presentation" />
             <option value="$PROJECT_DIR$/features/init" />
             <option value="$PROJECT_DIR$/features/init/demo" />
             <option value="$PROJECT_DIR$/features/init/domain" />

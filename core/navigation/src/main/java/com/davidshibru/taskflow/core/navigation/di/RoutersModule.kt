@@ -1,8 +1,10 @@
 package com.davidshibru.taskflow.core.navigation.di
 
+import com.davidshibru.taskflow.core.navigation.routers.ChatsRouterImpl
 import com.davidshibru.taskflow.core.navigation.routers.InitRouterImpl
 import com.davidshibru.taskflow.core.navigation.routers.SignInRouterImpl
 import com.davidshibru.taskflow.core.navigation.routers.SignUpRouterImpl
+import com.davidshibru.taskflow.feature.chats.presentation.ChatsRouter
 import com.davidshibru.taskflow.feature.init.presentation.InitRouter
 import com.davidshibru.taskflow.feature.signup.presentation.SignUpRouter
 import com.davidshibru.taskflow.features.signin.presentation.SignInRouter
@@ -14,6 +16,11 @@ import dagger.hilt.android.components.ViewModelComponent
 @Module
 @InstallIn(ViewModelComponent::class)
 interface RoutersModule {
+
+    @Binds
+    fun bindChatsRouter(
+        chatsRouterImpl: ChatsRouterImpl,
+    ): ChatsRouter
 
     @Binds
     fun bindInitRouter(
@@ -29,5 +36,4 @@ interface RoutersModule {
     fun bindSignUpRouter(
         signUpRouterImpl: SignUpRouterImpl,
     ): SignUpRouter
-
 }

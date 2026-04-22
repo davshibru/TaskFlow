@@ -6,4 +6,6 @@
     <string name="ok">OK</string>
     <string name="error">Error</string>
     <string name="invalid_response_from_the_remote_server">Invalid response from the remote server</string>
+    <string name="common_delete">Delete</string>
+    <string name="common_cancel">Cancel</string>
 </resources>

@@ -5,6 +5,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.NavBackStack
@@ -14,6 +15,7 @@ import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import com.davidshibru.taskflow.core.navigation.base.AppNavigator
 import com.davidshibru.taskflow.core.navigation.base.ExtendedNavGraphBuilder
+import com.davidshibru.taskflow.core.navigation.base.impl.ComposeDialogs
 import com.davidshibru.taskflow.core.navigation.base.impl.ExtendedNavGraphBuilderImpl
 
 @Suppress("UNCHECKED_CAST")
@@ -29,10 +31,8 @@ fun AppNavHost(
     val backStack = rememberNavBackStack(startDestination)
             as NavBackStack<Route>
 
-    NavigationEffects(
-        navigationChannel = appNavigator,
-        backStack = backStack,
-    )
+    NavigationEffects(navigationChannel = appNavigator, backStack = backStack)
+    val dialogs = remember { ComposeDialogs() }
 
     Surface(
         modifier = Modifier.background(MaterialTheme.colorScheme.background)
@@ -51,5 +51,7 @@ fun AppNavHost(
                 }
             }
         )
+
+        dialogs.Renderer()
     }
 }

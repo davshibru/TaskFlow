@@ -60,3 +60,7 @@ include(":data")
 include(":glue")
 
 include(":app-demo")
+
+include(":features:chats:domain")
+include(":features:chats:presentation")
+include(":features:chats:demo")

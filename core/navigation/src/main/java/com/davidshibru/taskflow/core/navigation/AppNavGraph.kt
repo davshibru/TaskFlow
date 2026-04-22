@@ -2,12 +2,14 @@ package com.davidshibru.taskflow.core.navigation
 
 import com.davidshibru.taskflow.core.navigation.base.ExtendedNavGraphBuilder
 import com.davidshibru.taskflow.core.navigation.base.composable
+import com.davidshibru.taskflow.feature.chats.presentation.chatsScreen
 import com.davidshibru.taskflow.feature.init.presentation.initScreen
 import com.davidshibru.taskflow.feature.signup.presentation.congratsScreen
 import com.davidshibru.taskflow.feature.signup.presentation.signUpScreen
 import com.davidshibru.taskflow.features.signin.presentation.signInScreen
 
 fun ExtendedNavGraphBuilder.buildAppNavGraph() {
+    composable<ChatsRoute> { chatsScreen() }
     composable<InitRoute> { initScreen() }
     composable<SignInRoute> { signInScreen() }
     composable<SignUpRoute> { signUpScreen() }

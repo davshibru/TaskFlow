@@ -5,4 +5,7 @@ interface CoreStringProvider : StringProvider {
     val unknownErrorMessage: String
     val invalidBackendResponseMessage: String
     fun backendErrorMessage(code: Int, backendMessage: String): String
+
+    val deleteAction: String
+    val cancelAction: String
 }

@@ -17,3 +17,6 @@ data object SignUpRoute : Route
 
 @Serializable
 data object CongratsRoute : Route
+
+@Serializable
+data object ChatsRoute: Route

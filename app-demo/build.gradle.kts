@@ -15,6 +15,10 @@ android {
             dimension = "feature"
             applicationIdSuffix = ".init"
         }
+        create("chats") {
+            dimension = "feature"
+            applicationIdSuffix = ".chats"
+        }
         create("signin") {
             dimension = "feature"
             applicationIdSuffix = ".signin"
@@ -56,6 +60,8 @@ dependencies {
 
     "initImplementation"(projects.features.init.presentation)
     "initImplementation"(projects.features.init.demo)
+    "chatsImplementation"(projects.features.chats.presentation)
+    "chatsImplementation"(projects.features.chats.demo)
     "signinImplementation"(projects.features.signIn.presentation)
     "signinImplementation"(projects.features.signIn.demo)
     "signupImplementation"(projects.features.signUp.presentation)
