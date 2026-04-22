@@ -18,6 +18,8 @@ class TemplateGeneratorImpl {
 
     private fun generateFeatureModule(basePath: String, featureName: String, args: InputArgs) {
         println("🚀 Creating feature module: $featureName...")
+        val presentationPackageName = "${args.packageName}.presentation"
+        val screenFunctionName = "${ProjectUtils.lowerCamelName(featureName)}Screen"
 
         // --- 1. ДОМЕННЫЙ СЛОЙ (DOMAIN) ---
         val domainModuleName = "${args.moduleName}:domain"
@@ -84,9 +86,11 @@ class TemplateGeneratorImpl {
 
 
         // --- 2. СЛОЙ ПРЕДСТАВЛЕНИЯ (PRESENTATION) ---
+        val presentationFeatures = (args.features + listOf("--compose", "--hilt", "--navigation")).distinct()
         val presentationArgs = args.copy(
             moduleName = "${args.moduleName}:presentation",
-            packageName = "${args.packageName}.presentation"
+            packageName = presentationPackageName,
+            features = presentationFeatures
         )
         val domainAccessor = toTypeSafeAccessor(domainModuleName)
 
@@ -94,12 +98,19 @@ class TemplateGeneratorImpl {
             path = "$basePath/presentation",
             className = null,
             args = presentationArgs,
+            extraPlugins = listOf("alias(libs.plugins.convention.serialization)"),
+            androidConfigLines = listOf(
+                "resourcePrefix = \"${ProjectUtils.snakeCaseName(args.moduleName)}_\""
+            ),
             predefinedDependencies = listOf(
                 "implementation($domainAccessor)",
                 "implementation(projects.core.essentials)",
-                "implementation(projects.core.theme)" // Если нужен UI (Compose)
+                "implementation(projects.core.theme)",
+                "implementation(projects.core.presentation)",
+                "implementation(projects.core.navigationDsl)"
             ),
             extraDependencies = listOf(
+                "testImplementation(projects.core.presentationTest)",
                 "androidTestImplementation(libs.androidx.junit)",
                 "androidTestImplementation(libs.androidx.espresso.core)"
             )
@@ -117,7 +128,11 @@ class TemplateGeneratorImpl {
 
         ProjectUtils.writeSourceFile(
             "$basePath/presentation", presentationArgs.packageName, "${featureName}Screen.kt",
-            CodeTemplates.screenClass(presentationArgs.packageName, featureName)
+            CodeTemplates.screenClass(
+                packageName = presentationArgs.packageName,
+                featureName = featureName,
+                screenFunctionName = screenFunctionName
+            )
         )
 
         ProjectUtils.addToGitIfRequested("$basePath/presentation/src/main/java", args)
@@ -156,6 +171,21 @@ class TemplateGeneratorImpl {
             CodeTemplates.demoHiltModule(demoPackageName, domainPackageName, featureName)
         )
 
+        updateCoreNavigation(
+            featureName = featureName,
+            moduleName = args.moduleName,
+            presentationPackageName = presentationPackageName,
+            screenFunctionName = screenFunctionName,
+            args = args
+        )
+        updateAppDemo(
+            featureName = featureName,
+            moduleName = args.moduleName,
+            presentationPackageName = presentationPackageName,
+            screenFunctionName = screenFunctionName,
+            args = args
+        )
+
         ProjectUtils.addToGitIfRequested(basePath, args)
 
         println("✅ Feature $featureName generated successfully with Domain, Presentation, and Demo modules!")
@@ -165,6 +195,8 @@ class TemplateGeneratorImpl {
         path: String,
         className: String? = null,
         args: InputArgs,
+        extraPlugins: List<String> = emptyList(),
+        androidConfigLines: List<String> = emptyList(),
         predefinedDependencies: List<String> = emptyList(),
         extraDependencies: List<String> = emptyList()
     ) {
@@ -173,6 +205,7 @@ class TemplateGeneratorImpl {
 
         if (args.features.contains("--compose")) plugins.add("alias(libs.plugins.convention.compose)")
         if (args.features.contains("--hilt")) plugins.add("alias(libs.plugins.convention.hilt)")
+        plugins.addAll(extraPlugins)
 
         val baseDeps = mutableListOf(
             "implementation(libs.androidx.core.ktx)",
@@ -201,6 +234,7 @@ class TemplateGeneratorImpl {
             }
             android {
                 namespace = "${args.packageName}"
+                ${androidConfigLines.joinToString("\n                ")}
             }
             dependencies {
                 ${allDeps.joinToString("\n                ")}
@@ -309,6 +343,144 @@ class TemplateGeneratorImpl {
         ProjectUtils.appendToSettings(args.moduleName)
         ProjectUtils.addToGitIfRequested(path, args)
         println("✅ Finished generating module at: $path")
+    }
+
+    private fun updateCoreNavigation(
+        featureName: String,
+        moduleName: String,
+        presentationPackageName: String,
+        screenFunctionName: String,
+        args: InputArgs
+    ) {
+        val routeName = "${featureName}Route"
+        val presentationAccessor = toTypeSafeAccessor("${moduleName}:presentation")
+
+        ProjectUtils.insertAfterIfMissing(
+            path = "core/navigation/build.gradle.kts",
+            marker = "dependencies {",
+            textToInsert = "    implementation($presentationAccessor)",
+            uniqueMarker = "implementation($presentationAccessor)"
+        )
+
+        ProjectUtils.insertBeforeIfMissing(
+            path = "core/navigation/src/main/java/com/davidshibru/taskflow/core/navigation/Route.kt",
+            marker = "",
+            textToInsert = "\n@kotlinx.serialization.Serializable\ndata object $routeName : Route",
+            uniqueMarker = "data object $routeName : Route"
+        )
+
+        ProjectUtils.ensureImport(
+            path = "core/navigation/src/main/java/com/davidshibru/taskflow/core/navigation/AppNavGraph.kt",
+            importLine = "import $presentationPackageName.$screenFunctionName"
+        )
+        ProjectUtils.insertBeforeIfMissing(
+            path = "core/navigation/src/main/java/com/davidshibru/taskflow/core/navigation/AppNavGraph.kt",
+            marker = "}",
+            textToInsert = "    composable<$routeName> { $screenFunctionName() }",
+            uniqueMarker = "composable<$routeName> { $screenFunctionName() }"
+        )
+
+        val routerFilePath =
+            "core/navigation/src/main/java/com/davidshibru/taskflow/core/navigation/routers/${featureName}RouterImpl.kt"
+        ProjectUtils.writeFile(
+            routerFilePath,
+            CodeTemplates.appRouterClass(
+                packageName = "com.davidshibru.taskflow.core.navigation.routers",
+                presentationPackageName = presentationPackageName,
+                featureName = featureName
+            )
+        )
+        ProjectUtils.addToGitIfRequested(routerFilePath, args)
+
+        val routersModulePath =
+            "core/navigation/src/main/java/com/davidshibru/taskflow/core/navigation/di/RoutersModule.kt"
+        ProjectUtils.ensureImport(
+            path = routersModulePath,
+            importLine = "import com.davidshibru.taskflow.core.navigation.routers.${featureName}RouterImpl"
+        )
+        ProjectUtils.ensureImport(
+            path = routersModulePath,
+            importLine = "import $presentationPackageName.${featureName}Router"
+        )
+        ProjectUtils.insertBeforeIfMissing(
+            path = routersModulePath,
+            marker = "}",
+            textToInsert = """
+                
+                    @Binds
+                    fun bind${featureName}Router(
+                        ${ProjectUtils.lowerCamelName(featureName)}RouterImpl: ${featureName}RouterImpl,
+                    ): ${featureName}Router
+            """.trimIndent(),
+            uniqueMarker = "fun bind${featureName}Router("
+        )
+    }
+
+    private fun updateAppDemo(
+        featureName: String,
+        moduleName: String,
+        presentationPackageName: String,
+        screenFunctionName: String,
+        args: InputArgs
+    ) {
+        val flavorName = ProjectUtils.compactLowerName(moduleName)
+        val presentationAccessor = toTypeSafeAccessor("${moduleName}:presentation")
+        val demoAccessor = toTypeSafeAccessor("${moduleName}:demo")
+        val appDemoBuildGradle = "app-demo/build.gradle.kts"
+
+        ProjectUtils.insertBeforeIfMissing(
+            path = appDemoBuildGradle,
+            marker = "    defaultConfig {",
+            textToInsert = """
+                create("$flavorName") {
+                    dimension = "feature"
+                    applicationIdSuffix = ".$flavorName"
+                }
+            """.trimIndent().prependIndent("        "),
+            uniqueMarker = "create(\"$flavorName\")"
+        )
+
+        ProjectUtils.insertBeforeIfMissing(
+            path = appDemoBuildGradle,
+            marker = "    implementation(libs.androidx.core.ktx)",
+            textToInsert = """
+                "${flavorName}Implementation"($presentationAccessor)
+                "${flavorName}Implementation"($demoAccessor)
+            """.trimIndent().prependIndent("    "),
+            uniqueMarker = "\"${flavorName}Implementation\"($presentationAccessor)"
+        )
+
+        val demoBasePath = "app-demo/src/$flavorName/java/com/davidshibru/taskflow/demo"
+        val demoRouterPath = "$demoBasePath/Demo${featureName}Router.kt"
+        val demoModulePath = "$demoBasePath/DemoNavigationModule.kt"
+        val demoScreenPath = "$demoBasePath/DemoScreenConfig.kt"
+
+        ProjectUtils.writeFile(
+            demoRouterPath,
+            CodeTemplates.demoRouterClass(
+                presentationPackageName = presentationPackageName,
+                featureName = featureName
+            )
+        )
+        ProjectUtils.writeFile(
+            demoModulePath,
+            CodeTemplates.demoNavigationModule(
+                presentationPackageName = presentationPackageName,
+                featureName = featureName
+            )
+        )
+        ProjectUtils.writeFile(
+            demoScreenPath,
+            CodeTemplates.demoScreenConfig(
+                presentationPackageName = presentationPackageName,
+                featureName = featureName,
+                screenFunctionName = screenFunctionName
+            )
+        )
+
+        ProjectUtils.addToGitIfRequested(demoRouterPath, args)
+        ProjectUtils.addToGitIfRequested(demoModulePath, args)
+        ProjectUtils.addToGitIfRequested(demoScreenPath, args)
     }
 
     private fun getClassName(args: InputArgs): String {

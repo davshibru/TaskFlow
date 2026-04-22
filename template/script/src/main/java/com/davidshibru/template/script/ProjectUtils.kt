@@ -32,6 +32,86 @@ object ProjectUtils {
         }
     }
 
+    fun updateFile(path: String, transform: (String) -> String) {
+        val file = File(path)
+        if (!file.exists()) {
+            println("⚠️ Error: $path not found!")
+            return
+        }
+
+        val currentContent = file.readText()
+        val updatedContent = transform(currentContent)
+
+        if (updatedContent != currentContent) {
+            file.writeText(updatedContent)
+            println("   ✏️ Updated file: $path")
+        }
+    }
+
+    fun ensureImport(path: String, importLine: String) {
+        updateFile(path) { content ->
+            if (content.contains(importLine)) return@updateFile content
+
+            val packageMatch = Regex("""^package\s+[^\r\n]+""").find(content) ?: return@updateFile content
+            val insertIndex = Regex("""^import\s+[^\r\n]+""", RegexOption.MULTILINE)
+                .findAll(content)
+                .lastOrNull()
+                ?.range
+                ?.last
+                ?.plus(1)
+                ?: packageMatch.range.last + 1
+
+            val prefix = content.substring(0, insertIndex).trimEnd()
+            val suffix = content.substring(insertIndex).trimStart('\r', '\n')
+            buildString {
+                append(prefix)
+                append("\n\n")
+                append(importLine)
+                if (suffix.isNotEmpty()) {
+                    append("\n\n")
+                    append(suffix)
+                } else {
+                    append('\n')
+                }
+            }
+        }
+    }
+
+    fun insertBeforeIfMissing(
+        path: String,
+        marker: String,
+        textToInsert: String,
+        uniqueMarker: String = textToInsert.trim()
+    ) {
+        updateFile(path) { content ->
+            if (content.contains(uniqueMarker)) return@updateFile content
+
+            val index = content.lastIndexOf(marker)
+            if (index == -1) return@updateFile content
+
+            val normalizedInsert = textToInsert.trimEnd() + "\n"
+            content.substring(0, index) + normalizedInsert + content.substring(index)
+        }
+    }
+
+    fun insertAfterIfMissing(
+        path: String,
+        marker: String,
+        textToInsert: String,
+        uniqueMarker: String = textToInsert.trim()
+    ) {
+        updateFile(path) { content ->
+            if (content.contains(uniqueMarker)) return@updateFile content
+
+            val index = content.indexOf(marker)
+            if (index == -1) return@updateFile content
+
+            val insertIndex = index + marker.length
+            val normalizedInsert = "\n" + textToInsert.trimEnd()
+            content.substring(0, insertIndex) + normalizedInsert + content.substring(insertIndex)
+        }
+    }
+
     fun addToGitIfRequested(path: String, args: InputArgs) {
         if (args.features.contains("--git")) {
             try {
@@ -69,4 +149,15 @@ object ProjectUtils {
         }
         return "projects.$formatted"
     }
+
+    fun moduleSegment(moduleName: String): String = moduleName.substringAfterLast(":")
+
+    fun compactLowerName(moduleName: String): String =
+        moduleSegment(moduleName).replace("-", "").replace("_", "").lowercase()
+
+    fun snakeCaseName(moduleName: String): String =
+        moduleSegment(moduleName).replace("-", "_").replace(".", "_")
+
+    fun lowerCamelName(typeName: String): String =
+        typeName.replaceFirstChar { it.lowercase() }
 }

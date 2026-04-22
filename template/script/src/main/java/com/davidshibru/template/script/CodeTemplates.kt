@@ -113,6 +113,7 @@ object CodeTemplates {
     fun screenClass(
         packageName: String,
         featureName: String,
+        screenFunctionName: String,
         basePackage: String = "com.davidshibru.taskflow"
     ) = """
         package $packageName
@@ -127,18 +128,22 @@ object CodeTemplates {
         import androidx.compose.ui.Modifier
         import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
         import $basePackage.core.essentials.container.Container
+        import $basePackage.core.navigation.dsl.ScreenScope
+        import $basePackage.core.navigation.dsl.ScreenToolbar
         import $basePackage.core.theme.components.ContainerView
         
-        @Composable
-        fun ${featureName}Screen(
-            viewModel: ${featureName}ViewModel = hiltViewModel()
-        ) {
-            val container: Container<${featureName}ViewModel.State> by viewModel.stateFlow.collectAsState()
-        
-            ContainerView(
-                container = container,
-            ) { state ->
-                ${featureName}Content(state)
+        fun ScreenScope.$screenFunctionName() {
+            toolbar = ScreenToolbar.Hidden
+            
+            content {
+                val viewModel: ${featureName}ViewModel = hiltViewModel()
+                val container: Container<${featureName}ViewModel.State> by viewModel.stateFlow.collectAsState()
+            
+                ContainerView(
+                    container = container,
+                ) { state ->
+                    ${featureName}Content(state)
+                }
             }
         }
         
@@ -225,6 +230,92 @@ object CodeTemplates {
             fun bind${featureName}Repository(
                 impl: Demo${featureName}Repository
             ): ${featureName}Repository
+        }
+    """.trimIndent()
+
+    fun appRouterClass(
+        packageName: String,
+        presentationPackageName: String,
+        featureName: String
+    ) = """
+        package $packageName
+        
+        import $presentationPackageName.${featureName}Router
+        import com.davidshibru.taskflow.core.navigation.base.AppNavigator
+        import javax.inject.Inject
+        
+        class ${featureName}RouterImpl @Inject constructor(
+            private val appNavigator: AppNavigator,
+        ) : ${featureName}Router {
+        
+            override fun navigateBack() {
+                appNavigator.goBack()
+            }
+        }
+    """.trimIndent()
+
+    fun demoRouterClass(
+        presentationPackageName: String,
+        featureName: String
+    ) = """
+        package com.davidshibru.taskflow.demo
+        
+        import $presentationPackageName.${featureName}Router
+        import javax.inject.Inject
+        
+        class Demo${featureName}Router @Inject constructor(
+            private val demoNavigator: DemoNavigator,
+        ) : ${featureName}Router {
+        
+            override fun navigateBack() {
+                demoNavigator.goBack()
+            }
+        }
+    """.trimIndent()
+
+    fun demoNavigationModule(
+        presentationPackageName: String,
+        featureName: String
+    ) = """
+        package com.davidshibru.taskflow.demo
+        
+        import $presentationPackageName.${featureName}Router
+        import dagger.Binds
+        import dagger.Module
+        import dagger.hilt.InstallIn
+        import dagger.hilt.components.SingletonComponent
+        
+        @Module
+        @InstallIn(SingletonComponent::class)
+        interface DemoNavigationModule {
+        
+            @Binds
+            fun bind${featureName}Router(impl: Demo${featureName}Router): ${featureName}Router
+        }
+    """.trimIndent()
+
+    fun demoScreenConfig(
+        presentationPackageName: String,
+        featureName: String,
+        screenFunctionName: String
+    ) = """
+        package com.davidshibru.taskflow.demo
+        
+        import androidx.compose.runtime.Composable
+        import $presentationPackageName.$screenFunctionName
+        import kotlinx.serialization.Serializable
+        
+        @Serializable
+        private data object ${featureName}DemoRoute : DemoRoute
+        
+        @Composable
+        fun DemoScreen(demoNavigator: DemoNavigator) {
+            ProvideDemoNavigation(
+                navigator = demoNavigator,
+                startDestination = ${featureName}DemoRoute,
+            ) {
+                composable<${featureName}DemoRoute> { $screenFunctionName() }
+            }
         }
     """.trimIndent()
 }
