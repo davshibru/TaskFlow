@@ -5,9 +5,6 @@ import org.gradle.api.JavaVersion
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.configure
-import org.gradle.kotlin.dsl.withType
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 @Suppress("unused")
 class AndroidLibraryConventionPlugin : Plugin<Project> {
@@ -21,11 +18,7 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             configureAndroidLibrary(this)
         }
 
-        tasks.withType<KotlinCompile>().configureEach {
-            compilerOptions {
-                jvmTarget.set(JvmTarget.JVM_17)
-            }
-        }
+        configureJvmTarget()
     }
 }
 

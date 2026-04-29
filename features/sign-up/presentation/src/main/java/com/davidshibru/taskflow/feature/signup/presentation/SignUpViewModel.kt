@@ -3,6 +3,7 @@ package com.davidshibru.taskflow.feature.signup.presentation
 import androidx.lifecycle.viewModelScope
 import com.davidshibru.taskflow.core.essentials.container.Container
 import com.davidshibru.taskflow.core.essentials.container.asContainerStateFlow
+import com.davidshibru.taskflow.core.essentials.flows.throttle
 import com.davidshibru.taskflow.core.presentation.WithInitCallBack
 import com.davidshibru.taskflow.core.presentation.WithMviState
 import com.davidshibru.taskflow.core.presentation.base.AbstractViewModel
@@ -52,7 +53,7 @@ class SignUpViewModel @Inject constructor(
 
     override suspend fun onInitialized() {
         validateRequestsFlow
-            .debounce(VALIDATION_PERIOD_MILLIS)
+            .throttle(VALIDATION_PERIOD_MILLIS)
             .collect(::validate)
 
     }
