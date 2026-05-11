@@ -17,12 +17,16 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var demoNavigator: DemoNavigator
 
+    @Inject
+    lateinit var demoDialogs: DemoDialogs
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             DemoScreen(demoNavigator)
             exceptionHandler.ErrorDialog()
+            demoDialogs.Renderer()
         }
     }
 }
