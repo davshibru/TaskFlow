@@ -6,14 +6,17 @@ import com.davidshibru.taskflow.feature.chats.domain.entities.Chat
 import com.davidshibru.taskflow.feature.chats.domain.repositories.ChatsRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class DemoChatsRepository @Inject constructor() : ChatsRepository {
 
-    private var chats = listOf(
+    private val chats = MutableStateFlow(listOf(
         Chat(
             id = Id(1),
             title = "John",
@@ -32,22 +35,21 @@ class DemoChatsRepository @Inject constructor() : ChatsRepository {
             lastMessage = null,
             unreadMessageCount = 0,
         ),
-    )
-
-    private val subject = flow {
-        delay(1000)
-        emit(Container.success(chats))
-    }
+    ))
 
     override fun getChats(): Flow<Container<List<Chat>>> {
-        return subject
+        return chats
+            .onStart { delay(1000) }
+            .map { Container.success(it) }
     }
 
     override suspend fun deleteChat(chatId: Id) {
-        chats = chats.filter { it.id != chatId }
+        chats.update { currentChats ->
+            currentChats.filter { it.id != chatId }
+        }
     }
 
     override suspend fun getChatById(chatId: Id): Chat {
-        return chats.first { it.id == chatId }
+        return chats.value.first { it.id == chatId }
     }
 }
