@@ -18,25 +18,36 @@ fun <T> Flow<T>.asContainerStateFlow(
     started: SharingStarted = SharingStarted.WhileSubscribed(5000L)
 ): StateFlow<Container<T>> {
 
-    val loadTrigger = MutableSharedFlow<Unit>(replay = 1).apply {
-        tryEmit(Unit)
+    val loadTrigger = MutableSharedFlow<Boolean>(replay = 1).apply {
+        tryEmit(false)
     }
 
-    val reloadAction: () -> Unit = {
-        loadTrigger.tryEmit(Unit)
+    val reloadAction: ReloadAction = { silently ->
+        loadTrigger.tryEmit(silently)
     }
+
+    var lastCompletedContainer: Container.Completed<T>? = null
 
     return loadTrigger
-        .flatMapLatest {
+        .flatMapLatest { silently ->
             this@asContainerStateFlow
                 .map { value ->
-                    Container.Success(value, reloadAction) as Container<T>
+                    val container = Container.Success(value, reloadAction)
+                    lastCompletedContainer = container
+                    container as Container<T>
                 }
                 .onStart {
-                    emit(Container.Loading)
+                    val currentContainer = lastCompletedContainer
+                    if (silently && currentContainer != null) {
+                        emit(currentContainer.withLoading(isLoading = true))
+                    } else {
+                        emit(Container.Loading)
+                    }
                 }
                 .catch { error ->
-                    emit(Container.Error(error as Exception, reloadAction))
+                    val container = Container.Error(error as Exception, reloadAction)
+                    lastCompletedContainer = container
+                    emit(container)
                 }
         }
         .stateIn(

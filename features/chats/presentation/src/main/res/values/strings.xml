@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="chats_title">Chats</string>
+
     <string name="chats_chat_removal">Chat Removal</string>
     <string name="chats_confirm_delete_message">Are you sure you want remove chat \'%1$s\'</string>
+    <string name="chats_empty_message">You don\'t have existing chats ye. Would you like to create a new one</string>
+    <string name="chats_create_chat">Create Chat</string>
+    <string name="chats_no_messages">no messages</string>
+    <string name="chats_delete_chat">Delete Chat</string>
 </resources>

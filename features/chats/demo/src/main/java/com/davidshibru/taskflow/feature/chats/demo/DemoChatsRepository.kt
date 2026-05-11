@@ -21,13 +21,13 @@ class DemoChatsRepository @Inject constructor() : ChatsRepository {
             unreadMessageCount = 2,
         ),
         Chat(
-            id = Id(1),
+            id = Id(2),
             title = "Jane",
             lastMessage = "Lorem Ipsim Test Test!",
             unreadMessageCount = 1,
         ),
         Chat(
-            id = Id(1),
+            id = Id(3),
             title = "Gendalph White",
             lastMessage = null,
             unreadMessageCount = 0,

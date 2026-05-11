@@ -4,13 +4,15 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlin.reflect.KClass
 
-typealias ReloadAction = () -> Unit
+typealias ReloadAction = (silently: Boolean) -> Unit
 
 interface ContainerScope {
+    val isLoading: Boolean
+
     val reloadAction: ReloadAction
 
-    fun retry() {
-        reloadAction.invoke()
+    fun retry(silently: Boolean = false) {
+        reloadAction.invoke(silently)
     }
 }
 
@@ -34,14 +36,14 @@ sealed class Container<out T> {
 
     fun <T> successContainer(
         value: T,
-        reloadAction: ReloadAction = {},
+        reloadAction: ReloadAction = { _ -> },
     ) : Success<T> {
         return Success(value, reloadAction)
     }
 
     fun errorContainer(
         exception: Exception,
-        reloadAction: ReloadAction = {},
+        reloadAction: ReloadAction = { _ -> },
     ) : Error {
         return Error(exception, reloadAction)
     }
@@ -51,14 +53,14 @@ sealed class Container<out T> {
     companion object {
         fun <T> success(
             value: T,
-            reloadAction: ReloadAction = {},
+            reloadAction: ReloadAction = { _ -> },
         ) : Success<T> {
             return Success(value, reloadAction)
         }
 
         fun error(
             exception: Exception,
-            reloadAction: ReloadAction = {},
+            reloadAction: ReloadAction = { _ -> },
         ) : Error {
             return Error(exception, reloadAction)
         }
@@ -78,27 +80,29 @@ sealed class Container<out T> {
 
     data class Error(
         val exception: Exception,
-        override val reloadAction: ReloadAction = {}
+        override val reloadAction: ReloadAction = { _ -> },
+        override val isLoading: Boolean = false,
     ) : Completed<Nothing>()
 
     data class Success<T>(
         val value: T,
-        override val reloadAction: ReloadAction = {},
+        override val reloadAction: ReloadAction = { _ -> },
+        override val isLoading: Boolean = false,
     ) : Completed<T>()
 }
 
 fun <T, R> Container<T>.map(mapper: (T) -> R): Container<R> {
     return fold(
-        onSuccess = { Container.Success(mapper(it), reloadAction) },
-        onError = { Container.Error(it, reloadAction) },
+        onSuccess = { Container.Success(mapper(it), reloadAction, isLoading) },
+        onError = { Container.Error(it, reloadAction, isLoading) },
         onLoading = { Container.Loading }
     )
 }
 
 fun <T, R> Container.Completed<T>.map(mapper: (T) -> R): Container.Completed<R> {
     return when(this) {
-        is Container.Error -> { Container.Error(this.exception, reloadAction) }
-        is Container.Success<T> -> { Container.Success(mapper(value), reloadAction) }
+        is Container.Error -> { Container.Error(this.exception, reloadAction, isLoading) }
+        is Container.Success<T> -> { Container.Success(mapper(value), reloadAction, isLoading) }
     }
 }
 
@@ -114,9 +118,9 @@ inline fun <T, E : Exception> Container<T>.mapException(
         try {
             @Suppress("UNCHECKED_CAST")
             val mappedException = mapper(current.exception as E)
-            Container.Error(mappedException, current.reloadAction)
+            Container.Error(mappedException, current.reloadAction, current.isLoading)
         } catch (e: Exception) {
-            Container.Error(e, current.reloadAction)
+            Container.Error(e, current.reloadAction, current.isLoading)
         }
     } else {
         this
@@ -134,7 +138,7 @@ inline fun <T, E : Exception> Container.Completed<T>.catch(
             @Suppress("UNCHECKED_CAST")
             mapper(current.exception as E)
         } catch (e: Exception) {
-            Container.Error(e, current.reloadAction)
+            Container.Error(e, current.reloadAction, current.isLoading)
         }
     } else {
         this
@@ -167,4 +171,13 @@ fun <T> Container<T>.getExceptionOrNull(): Exception? {
 
 fun <T> Container<T>.getValueOrNull(): T? {
     return foldNullable(onSuccess = { it },)
+}
+
+fun <T> Container.Completed<T>.withLoading(
+    isLoading: Boolean,
+): Container.Completed<T> {
+    return when (this) {
+        is Container.Error -> copy(isLoading = isLoading)
+        is Container.Success<T> -> copy(isLoading = isLoading)
+    }
 }

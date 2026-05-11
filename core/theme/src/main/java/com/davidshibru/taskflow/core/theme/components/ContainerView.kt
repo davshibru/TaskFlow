@@ -4,10 +4,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -29,6 +31,7 @@ import com.davidshibru.taskflow.core.theme.R
 fun <T> ContainerView(
     container: Container<T>,
     modifier: Modifier = Modifier,
+    enablePullToRefresh: Boolean = false,
     exceptionToMessageMapper: ExceptionToMessageMapper = ExceptionToMessageMapper,
     content: @Composable BoxAndContainerScope.(T) -> Unit,
 ) {
@@ -39,11 +42,22 @@ fun <T> ContainerView(
             },
             onError = { exception ->
                 val message = exceptionToMessageMapper.getLocalizedMessage(exception)
-                ErrorContainerView(message = message, onReload = reloadAction)
+                ErrorContainerView(message = message, onReload = { retry() })
             },
             onSuccess = { value ->
-                val combinedScope = BoxAndContainerScopeImpl(this@Box, this)
-                combinedScope.content(value)
+                if (enablePullToRefresh) {
+                    PullToRefreshBox(
+                        isRefreshing = isLoading,
+                        onRefresh = { retry(silently = true) },
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        val combinedScope = BoxAndContainerScopeImpl(this@PullToRefreshBox, this@fold)
+                        combinedScope.content(value)
+                    }
+                } else {
+                    val combinedScope = BoxAndContainerScopeImpl(this@Box, this)
+                    combinedScope.content(value)
+                }
             },
         )
     }
