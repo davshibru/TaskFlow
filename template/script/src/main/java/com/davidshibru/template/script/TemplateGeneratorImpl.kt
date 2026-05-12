@@ -44,14 +44,15 @@ class TemplateGeneratorImpl {
             ),
         )
         // Удаляем маркерный класс, так как мы сгенерируем структуру вручную
-        File(
+        val domainMarkerPath =
             "$basePath/domain/src/main/java/${
                 domainPackageName.replace(
                     ".",
                     "/"
                 )
             }/DomainMarker.kt"
-        ).delete()
+        File(domainMarkerPath).delete()
+        ProjectUtils.addToGitIfRequested(domainMarkerPath, args)
 
         // Генерируем структуру папок как на скриншоте
         ProjectUtils.writeSourceFile(
@@ -60,8 +61,17 @@ class TemplateGeneratorImpl {
         )
 
         ProjectUtils.writeSourceFile(
-            "$basePath/domain", "$domainPackageName.exceptions.base", "${featureName}Exception.kt",
-            CodeTemplates.exceptionClass("$domainPackageName.exceptions.base", featureName)
+            "$basePath/domain", "$domainPackageName.exceptions.base", "Abstract${featureName}AppException.kt",
+            CodeTemplates.abstractFeatureExceptionClass(
+                packageName = "$domainPackageName.exceptions.base",
+                domainPackageName = domainPackageName,
+                featureName = featureName,
+            )
+        )
+
+        ProjectUtils.writeSourceFile(
+            "$basePath/domain", "$domainPackageName.exceptions", "Default${featureName}Exception.kt",
+            CodeTemplates.defaultFeatureExceptionClass("$domainPackageName.exceptions", featureName)
         )
 
         ProjectUtils.writeSourceFile(
@@ -70,19 +80,35 @@ class TemplateGeneratorImpl {
         )
 
         ProjectUtils.writeSourceFile(
-            "$basePath/domain", "$domainPackageName.usecases", "${featureName}UseCase.kt",
-            CodeTemplates.useCaseInterface("$domainPackageName.usecases", featureName)
+            "$basePath/domain", domainPackageName, "Get${featureName}UseCase.kt",
+            CodeTemplates.getUseCaseInterface(domainPackageName, featureName)
         )
 
-        // Папка resources пока просто создается пустой
-        File(
-            "$basePath/domain/src/main/java/${
-                domainPackageName.replace(
-                    ".",
-                    "/"
-                )
-            }/resources"
-        ).mkdirs()
+        ProjectUtils.writeSourceFile(
+            "$basePath/domain", domainPackageName, "Save${featureName}UseCase.kt",
+            CodeTemplates.saveUseCaseInterface(domainPackageName, featureName)
+        )
+
+        ProjectUtils.writeSourceFile(
+            "$basePath/domain", "$domainPackageName.usecases", "Get${featureName}UseCaseImpl.kt",
+            CodeTemplates.getUseCaseImpl(domainPackageName, featureName)
+        )
+
+        ProjectUtils.writeSourceFile(
+            "$basePath/domain", "$domainPackageName.usecases", "Save${featureName}UseCaseImpl.kt",
+            CodeTemplates.saveUseCaseImpl(domainPackageName, featureName)
+        )
+
+        ProjectUtils.writeSourceFile(
+            "$basePath/domain", "$domainPackageName.di", "UseCasesModule.kt",
+            CodeTemplates.useCasesModule(domainPackageName, featureName)
+        )
+
+        ProjectUtils.writeSourceFile(
+            "$basePath/domain", "$domainPackageName.resources", "${featureName}StringProvider.kt",
+            CodeTemplates.stringProviderInterface("$domainPackageName.resources", featureName)
+        )
+        ProjectUtils.addToGitIfRequested("$basePath/domain/src/main/java", args)
 
 
         // --- 2. СЛОЙ ПРЕДСТАВЛЕНИЯ (PRESENTATION) ---
@@ -135,7 +161,33 @@ class TemplateGeneratorImpl {
             )
         )
 
+        val defaultErrorStringName = "${ProjectUtils.snakeCaseName(args.moduleName)}_default_error"
+        ProjectUtils.writeSourceFile(
+            "$basePath/presentation", "${presentationArgs.packageName}.resources", "${featureName}StringProviderImpl.kt",
+            CodeTemplates.stringProviderImpl(
+                packageName = presentationArgs.packageName,
+                domainPackageName = domainPackageName,
+                featureName = featureName,
+                errorStringName = defaultErrorStringName,
+            )
+        )
+
+        ProjectUtils.writeSourceFile(
+            "$basePath/presentation", "${presentationArgs.packageName}.di", "${featureName}StringProviderModule.kt",
+            CodeTemplates.stringProviderModule(
+                packageName = presentationArgs.packageName,
+                domainPackageName = domainPackageName,
+                featureName = featureName,
+            )
+        )
+
+        ProjectUtils.writeFile(
+            "$basePath/presentation/src/main/res/values/strings.xml",
+            CodeTemplates.presentationStringsXml(defaultErrorStringName, featureName)
+        )
+
         ProjectUtils.addToGitIfRequested("$basePath/presentation/src/main/java", args)
+        ProjectUtils.addToGitIfRequested("$basePath/presentation/src/main/res", args)
 
 
         // --- 3. ДЕМО СЛОЙ (DEMO) ---
@@ -170,6 +222,7 @@ class TemplateGeneratorImpl {
             "$basePath/demo", demoPackageName, "${featureName}DemoModule.kt",
             CodeTemplates.demoHiltModule(demoPackageName, domainPackageName, featureName)
         )
+        ProjectUtils.addToGitIfRequested("$basePath/demo/src/main/java", args)
 
         updateCoreNavigation(
             featureName = featureName,
@@ -186,9 +239,22 @@ class TemplateGeneratorImpl {
             args = args
         )
 
-        ProjectUtils.addToGitIfRequested(basePath, args)
+        addFeatureIntegrationFilesToGit(args)
 
         println("✅ Feature $featureName generated successfully with Domain, Presentation, and Demo modules!")
+    }
+
+    private fun addFeatureIntegrationFilesToGit(args: InputArgs) {
+        listOf(
+            "settings.gradle.kts",
+            "core/navigation/build.gradle.kts",
+            "core/navigation/src/main/java/com/davidshibru/taskflow/core/navigation/Route.kt",
+            "core/navigation/src/main/java/com/davidshibru/taskflow/core/navigation/AppNavGraph.kt",
+            "core/navigation/src/main/java/com/davidshibru/taskflow/core/navigation/di/RoutersModule.kt",
+            "app-demo/build.gradle.kts",
+        ).forEach { path ->
+            ProjectUtils.addToGitIfRequested(path, args)
+        }
     }
 
     private fun generateAndroidLibrary(
@@ -270,8 +336,7 @@ class TemplateGeneratorImpl {
     ) {
         ProjectUtils.ensureParentBuildFilesExist(path, args)
         val plugins = mutableListOf(
-            "id(\"java-library\")",
-            "alias(libs.plugins.jetbrains.kotlin.jvm)"
+            "alias(libs.plugins.convention.kotlin.library)"
         )
 
         if (args.features.contains("--ksp")) plugins.add("alias(libs.plugins.ksp)")
@@ -282,13 +347,6 @@ class TemplateGeneratorImpl {
         val buildGradle = """
             plugins {
                 ${plugins.joinToString("\n                ")}
-            }
-            java {
-                sourceCompatibility = JavaVersion.VERSION_17
-                targetCompatibility = JavaVersion.VERSION_17
-            }
-            kotlin {
-                compilerOptions { jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17 }
             }
             dependencies {
                 ${allDeps.joinToString("\n                ")}
@@ -362,10 +420,9 @@ class TemplateGeneratorImpl {
             uniqueMarker = "implementation($presentationAccessor)"
         )
 
-        ProjectUtils.insertBeforeIfMissing(
+        ProjectUtils.appendIfMissing(
             path = "core/navigation/src/main/java/com/davidshibru/taskflow/core/navigation/Route.kt",
-            marker = "",
-            textToInsert = "\n@kotlinx.serialization.Serializable\ndata object $routeName : Route",
+            textToAppend = "@Serializable\ndata object $routeName : Route",
             uniqueMarker = "data object $routeName : Route"
         )
 
@@ -411,7 +468,7 @@ class TemplateGeneratorImpl {
                     fun bind${featureName}Router(
                         ${ProjectUtils.lowerCamelName(featureName)}RouterImpl: ${featureName}RouterImpl,
                     ): ${featureName}Router
-            """.trimIndent(),
+            """.trimIndent().prependIndent("    "),
             uniqueMarker = "fun bind${featureName}Router("
         )
     }
@@ -423,18 +480,19 @@ class TemplateGeneratorImpl {
         screenFunctionName: String,
         args: InputArgs
     ) {
-        val flavorName = ProjectUtils.compactLowerName(moduleName)
+        val flavorName = ProjectUtils.demoFlavorName(moduleName)
+        val applicationIdSuffix = ProjectUtils.compactLowerName(moduleName)
         val presentationAccessor = toTypeSafeAccessor("${moduleName}:presentation")
         val demoAccessor = toTypeSafeAccessor("${moduleName}:demo")
         val appDemoBuildGradle = "app-demo/build.gradle.kts"
 
-        ProjectUtils.insertBeforeIfMissing(
+        ProjectUtils.insertIntoBlockBeforeClosingBraceIfMissing(
             path = appDemoBuildGradle,
-            marker = "    defaultConfig {",
+            blockStartMarker = "    productFlavors {",
             textToInsert = """
                 create("$flavorName") {
                     dimension = "feature"
-                    applicationIdSuffix = ".$flavorName"
+                    applicationIdSuffix = ".$applicationIdSuffix"
                 }
             """.trimIndent().prependIndent("        "),
             uniqueMarker = "create(\"$flavorName\")"

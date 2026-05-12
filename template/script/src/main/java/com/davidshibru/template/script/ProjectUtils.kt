@@ -1,6 +1,7 @@
 package com.davidshibru.template.script
 
 import java.io.File
+import java.util.concurrent.TimeUnit
 
 object ProjectUtils {
 
@@ -112,12 +113,75 @@ object ProjectUtils {
         }
     }
 
+    fun appendIfMissing(
+        path: String,
+        textToAppend: String,
+        uniqueMarker: String = textToAppend.trim()
+    ) {
+        updateFile(path) { content ->
+            if (content.contains(uniqueMarker)) return@updateFile content
+
+            content.trimEnd() + "\n" + textToAppend.trimEnd() + "\n"
+        }
+    }
+
+    fun insertIntoBlockBeforeClosingBraceIfMissing(
+        path: String,
+        blockStartMarker: String,
+        textToInsert: String,
+        uniqueMarker: String = textToInsert.trim()
+    ) {
+        updateFile(path) { content ->
+            if (content.contains(uniqueMarker)) return@updateFile content
+
+            val blockStart = content.indexOf(blockStartMarker)
+            if (blockStart == -1) return@updateFile content
+
+            val openingBrace = content.indexOf('{', blockStart)
+            if (openingBrace == -1) return@updateFile content
+
+            var depth = 0
+            for (index in openingBrace until content.length) {
+                when (content[index]) {
+                    '{' -> depth++
+                    '}' -> {
+                        depth--
+                        if (depth == 0) {
+                            val lineStart = content.lastIndexOf('\n', startIndex = index - 1).let {
+                                if (it == -1) 0 else it + 1
+                            }
+                            val normalizedInsert = textToInsert.trimEnd() + "\n"
+                            return@updateFile content.substring(0, lineStart) +
+                                normalizedInsert +
+                                content.substring(lineStart)
+                        }
+                    }
+                }
+            }
+
+            content
+        }
+    }
+
     fun addToGitIfRequested(path: String, args: InputArgs) {
         if (args.features.contains("--git")) {
             try {
-                val process = ProcessBuilder("git", "add", path).directory(File(".")).start()
-                process.waitFor()
-                println("   🌿 Added to Git: $path")
+                val process = ProcessBuilder("git", "add", path)
+                    .directory(File("."))
+                    .redirectErrorStream(true)
+                    .start()
+                val finished = process.waitFor(15, TimeUnit.SECONDS)
+                if (finished && process.exitValue() == 0) {
+                    println("   🌿 Added to Git: $path")
+                } else {
+                    if (!finished) {
+                        process.destroyForcibly()
+                        process.waitFor(2, TimeUnit.SECONDS)
+                    }
+                    val output = process.inputStream.bufferedReader().readText().trim()
+                    val reason = output.takeIf { it.isNotEmpty() } ?: "git add timed out or failed"
+                    println("   ⚠️ Failed to add to Git: $path ($reason)")
+                }
             } catch (e: Exception) {
                 println("   ⚠️ Failed to add to Git: ${e.message}")
             }
@@ -154,6 +218,17 @@ object ProjectUtils {
 
     fun compactLowerName(moduleName: String): String =
         moduleSegment(moduleName).replace("-", "").replace("_", "").lowercase()
+
+    fun demoFlavorName(moduleName: String): String {
+        val flavorName = compactLowerName(moduleName)
+        val reservedSourceSetNames = setOf("main", "test", "androidtest")
+
+        return if (flavorName in reservedSourceSetNames) {
+            "${flavorName}Feature"
+        } else {
+            flavorName
+        }
+    }
 
     fun snakeCaseName(moduleName: String): String =
         moduleSegment(moduleName).replace("-", "_").replace(".", "_")
