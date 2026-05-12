@@ -64,3 +64,7 @@ include(":app-demo")
 include(":features:chats:domain")
 include(":features:chats:presentation")
 include(":features:chats:demo")
+
+include(":features:main:domain")
+include(":features:main:presentation")
+include(":features:main:demo")

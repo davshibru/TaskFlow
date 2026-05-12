@@ -46,6 +46,10 @@
             <option value="$PROJECT_DIR$/features/init/demo" />
             <option value="$PROJECT_DIR$/features/init/domain" />
             <option value="$PROJECT_DIR$/features/init/presentation" />
+            <option value="$PROJECT_DIR$/features/main" />
+            <option value="$PROJECT_DIR$/features/main/demo" />
+            <option value="$PROJECT_DIR$/features/main/domain" />
+            <option value="$PROJECT_DIR$/features/main/presentation" />
             <option value="$PROJECT_DIR$/features/sign-in" />
             <option value="$PROJECT_DIR$/features/sign-in/demo" />
             <option value="$PROJECT_DIR$/features/sign-in/domain" />

@@ -19,4 +19,7 @@ data object SignUpRoute : Route
 data object CongratsRoute : Route
 
 @Serializable
-data object ChatsRoute: Route
+data object ChatsRoute : Route
+
+@Serializable
+data object MainRoute : Route

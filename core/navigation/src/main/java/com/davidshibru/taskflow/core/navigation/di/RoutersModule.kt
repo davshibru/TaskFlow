@@ -2,11 +2,13 @@ package com.davidshibru.taskflow.core.navigation.di
 
 import com.davidshibru.taskflow.core.navigation.routers.ChatsRouterImpl
 import com.davidshibru.taskflow.core.navigation.routers.InitRouterImpl
+import com.davidshibru.taskflow.core.navigation.routers.MainRouterImpl
 import com.davidshibru.taskflow.core.navigation.routers.SignInRouterImpl
 import com.davidshibru.taskflow.core.navigation.routers.SignUpRouterImpl
 import com.davidshibru.taskflow.feature.chats.presentation.ChatsRouter
 import com.davidshibru.taskflow.feature.init.presentation.InitRouter
 import com.davidshibru.taskflow.feature.signup.presentation.SignUpRouter
+import com.davidshibru.taskflow.features.main.presentation.MainRouter
 import com.davidshibru.taskflow.features.signin.presentation.SignInRouter
 import dagger.Binds
 import dagger.Module
@@ -36,4 +38,9 @@ interface RoutersModule {
     fun bindSignUpRouter(
         signUpRouterImpl: SignUpRouterImpl,
     ): SignUpRouter
+
+    @Binds
+    fun bindMainRouter(
+        mainRouterImpl: MainRouterImpl,
+    ): MainRouter
 }

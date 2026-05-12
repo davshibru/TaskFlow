@@ -8,10 +8,13 @@ import com.davidshibru.taskflow.feature.signup.presentation.congratsScreen
 import com.davidshibru.taskflow.feature.signup.presentation.signUpScreen
 import com.davidshibru.taskflow.features.signin.presentation.signInScreen
 
+import com.davidshibru.taskflow.features.main.presentation.mainScreen
+
 fun ExtendedNavGraphBuilder.buildAppNavGraph() {
     composable<ChatsRoute> { chatsScreen() }
     composable<InitRoute> { initScreen() }
     composable<SignInRoute> { signInScreen() }
     composable<SignUpRoute> { signUpScreen() }
     composable<CongratsRoute> { congratsScreen() }
+    composable<MainRoute> { mainScreen() }
 }
