@@ -3,6 +3,7 @@ package com.davidshibru.taskflow.features.signin.presentation
 import androidx.lifecycle.viewModelScope
 import com.davidshibru.taskflow.core.essentials.container.asContainerStateFlow
 import com.davidshibru.taskflow.core.presentation.WithMviState
+import com.davidshibru.taskflow.core.presentation.WithMviState.HideProgressPolicy.*
 import com.davidshibru.taskflow.core.presentation.base.AbstractViewModel
 import com.davidshibru.taskflow.features.signin.domain.SignInUseCase
 import com.davidshibru.taskflow.features.signin.domain.entities.Credentials
@@ -30,11 +31,12 @@ class SignInViewModel @Inject constructor(
     fun onLaunchSignUp() = router.launchSignUp()
 
 
-    fun signIn(credentials: Credentials) = launch {
+    fun signIn(credentials: Credentials) = launch(onError) {
         try {
             signInUseCase.invoke(credentials)
-            router.launchMain()
+            router.launchMainFlow()
         } catch (e: EmptyFieldException) {
+            updateProgress(false)
             showEmptyFieldErrorMessage(e.inputField)
         }
     }

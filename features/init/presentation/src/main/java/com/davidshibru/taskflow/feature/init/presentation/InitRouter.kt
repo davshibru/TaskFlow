@@ -1,5 +1,6 @@
 package com.davidshibru.taskflow.feature.init.presentation
 
 interface InitRouter {
-    fun launchSignIn()
+    fun launchAuthFlow()
+    fun launchMainFlow()
 }

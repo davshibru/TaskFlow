@@ -2,8 +2,11 @@ package com.davidshibru.taskflow.core.navigation.routers
 
 import android.content.Context
 import android.widget.Toast
+import com.davidshibru.taskflow.core.navigation.ChatsRoute
 import com.davidshibru.taskflow.core.navigation.SignUpRoute
 import com.davidshibru.taskflow.core.navigation.base.AppNavigator
+import com.davidshibru.taskflow.core.navigation.base.launchMainFlow
+import com.davidshibru.taskflow.feature.chats.presentation.ChatsRouter
 import com.davidshibru.taskflow.features.signin.presentation.SignInRouter
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -22,9 +25,8 @@ class SignInRouterImpl @Inject constructor(
 
     }
 
-    override fun launchMain() {
-        Toast.makeText(context, "ToDo: Launch Main", Toast.LENGTH_SHORT).show()
-
+    override fun launchMainFlow() {
+        appNavigator.launchMainFlow()
     }
 
     override fun launchSignUp() {
