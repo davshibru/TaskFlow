@@ -58,6 +58,8 @@ dependencies {
 
     implementation(libs.androidx.compose.material.icons.extended)
 
+    implementation(libs.kotlinx.collections.immutable)
+
     "initImplementation"(projects.features.init.presentation)
     "initImplementation"(projects.features.init.demo)
     "chatsImplementation"(projects.features.chats.presentation)

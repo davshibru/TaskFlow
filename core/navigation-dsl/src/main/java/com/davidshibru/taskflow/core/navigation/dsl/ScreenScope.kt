@@ -13,6 +13,9 @@ interface ScreenScope : ConfiguredScreen {
     val coroutineScope: CoroutineScope
 
     override var toolbar: ScreenToolbar
+
+    override var navigationBar: ScreenNavigationBar
+
     fun content(block: @Composable () -> Unit)
 
     fun <T: ViewModel> viewModel(vmClass: KClass<T>) : T

@@ -16,6 +16,8 @@ dependencies {
     implementation(projects.core.essentials)
     implementation(projects.core.navigationDsl)
 
+    implementation(libs.kotlinx.collections.immutable)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

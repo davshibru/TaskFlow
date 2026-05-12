@@ -33,6 +33,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import com.davidshibru.taskflow.core.navigation.dsl.ScreenNavigationBar
 import com.davidshibru.taskflow.core.navigation.dsl.ScreenScope
 import com.davidshibru.taskflow.core.navigation.dsl.ScreenToolbar
 import dagger.hilt.android.lifecycle.withCreationCallback
@@ -139,6 +140,7 @@ private class DemoNavGraphBuilderImpl(
 
                 DemoScreenScaffold(
                     toolbar = screenScope.toolbar,
+                    navigationBar = screenScope.navigationBar,
                     showBackButton = backStack.indexOf(route) != 0,
                     onBackPressed = { backStack.removeLastOrNull() },
                 ) {
@@ -152,6 +154,7 @@ private class DemoNavGraphBuilderImpl(
 @Composable
 private fun DemoScreenScaffold(
     toolbar: ScreenToolbar,
+    navigationBar: ScreenNavigationBar,
     showBackButton: Boolean,
     modifier: Modifier = Modifier,
     onBackPressed: () -> Unit,
@@ -168,6 +171,13 @@ private fun DemoScreenScaffold(
                 )
             }
         },
+        bottomBar = {
+            if (navigationBar is ScreenNavigationBar.Default) {
+                DemoNavigationBar(
+                    navigationBar = navigationBar,
+                )
+            }
+        }
     ) { paddingValues ->
         Box(
             modifier = Modifier
@@ -189,6 +199,7 @@ private class DemoNav3ScreenScope(
     HasDefaultViewModelProviderFactory by defaultsProvider {
 
     override var toolbar: ScreenToolbar by mutableStateOf(ScreenToolbar.Hidden)
+    override var navigationBar: ScreenNavigationBar by mutableStateOf(ScreenNavigationBar.Hidden)
 
     private var content: @Composable () -> Unit by mutableStateOf({})
 

@@ -47,6 +47,7 @@ class ExtendedNavGraphBuilderImpl(
                 }
                 AppScreenScaffold(
                     toolbar = nav3ScreenScope.toolbar,
+                    navigationBar = nav3ScreenScope.navigationBar,
                     onBackPressed = { backStack.removeLastOrNull() },
                     showBackButton = backStack.indexOf(route) != 0,
                     modifier = Modifier.fillMaxSize(),

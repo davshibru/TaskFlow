@@ -39,7 +39,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.davidshibru.taskflow.core.essentials.container.Container
 import com.davidshibru.taskflow.core.essentials.entities.Id
@@ -48,14 +47,10 @@ import com.davidshibru.taskflow.core.navigation.dsl.ScreenToolbar
 import com.davidshibru.taskflow.core.theme.Dimens
 import com.davidshibru.taskflow.core.theme.components.AvatarImageView
 import com.davidshibru.taskflow.core.theme.components.ContainerView
-import com.davidshibru.taskflow.core.theme.components.ImageView
 import com.davidshibru.taskflow.core.theme.previews.PreviewScreenContent
 import com.davidshibru.taskflow.core.theme.previews.ScreenPreview
-import com.davidshibru.taskflow.feature.chats.domain.entities.Chat
-import com.davidshibru.taskflow.feature.chats.domain.entities.hasUnreadMessages
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
-import kotlin.math.max
 
 fun ScreenScope.chatsScreen() {
     toolbar = ScreenToolbar.Default(

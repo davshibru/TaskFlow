@@ -7,6 +7,7 @@ android {
     namespace = "com.davidshibru.taskflow.core.navigation.dsl"
 }
 dependencies {
+    implementation(libs.kotlinx.collections.immutable)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.compose.material.icons.extended)

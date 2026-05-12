@@ -10,6 +10,7 @@ import androidx.lifecycle.HasDefaultViewModelProviderFactory
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
+import com.davidshibru.taskflow.core.navigation.dsl.ScreenNavigationBar
 import com.davidshibru.taskflow.core.navigation.dsl.ScreenScope
 import com.davidshibru.taskflow.core.navigation.dsl.ScreenToolbar
 import dagger.hilt.android.lifecycle.withCreationCallback
@@ -26,6 +27,8 @@ internal class Nav3ScreenScope(
     HasDefaultViewModelProviderFactory by defaultsProvider {
 
     override var toolbar: ScreenToolbar by mutableStateOf(ScreenToolbar.Hidden)
+
+    override var navigationBar: ScreenNavigationBar by  mutableStateOf(ScreenNavigationBar.Hidden)
 
     private var content: @Composable () -> Unit by mutableStateOf({})
 
