@@ -22,8 +22,8 @@ android {
 dependencies {
     implementation(projects.core.data)
     implementation(projects.core.theme)
-    implementation(projects.core.navigation)
     implementation(projects.core.commonAndroid)
+    implementation(projects.navigation)
 
     implementation(projects.glue)
 

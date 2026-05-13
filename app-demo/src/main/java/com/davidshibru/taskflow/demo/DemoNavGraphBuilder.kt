@@ -1,15 +1,9 @@
 package com.davidshibru.taskflow.demo
 
 import com.davidshibru.taskflow.core.navigation.dsl.ScreenScope
-import kotlin.reflect.KClass
+import com.davidshibru.taskflow.navigation.common.NavGraphBuilder
 
-interface DemoNavGraphBuilder {
-
-    fun <T : DemoRoute> composable(
-        routeClass: KClass<T>,
-        content: ScreenScope.(T) -> Unit,
-    )
-}
+typealias DemoNavGraphBuilder = NavGraphBuilder<DemoRoute>
 
 inline fun <reified T : DemoRoute> DemoNavGraphBuilder.composable(
     noinline content: ScreenScope.(T) -> Unit,

@@ -1,38 +1,33 @@
 package com.davidshibru.taskflow.demo
 
+import com.davidshibru.taskflow.navigation.common.NavigationIntent
+import com.davidshibru.taskflow.navigation.common.Navigator
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 import javax.inject.Singleton
 
-sealed interface DemoNavigationIntent {
-    data class NavigateTo(val route: DemoRoute) : DemoNavigationIntent
-    data class Restart(val route: DemoRoute) : DemoNavigationIntent
-    data class Replace(val route: DemoRoute) : DemoNavigationIntent
-    data object GoBack : DemoNavigationIntent
-}
-
 @Singleton
-class DemoNavigator @Inject constructor() {
+class DemoNavigator @Inject constructor() : Navigator<DemoRoute> {
 
-    private val _navigationEvents = Channel<DemoNavigationIntent>(Channel.Factory.BUFFERED)
+    private val _navigationEvents = Channel<NavigationIntent<DemoRoute>>(Channel.Factory.BUFFERED)
 
-    val navigationEvents: Flow<DemoNavigationIntent> = _navigationEvents.receiveAsFlow()
+    override val navigationEvents: Flow<NavigationIntent<DemoRoute>> = _navigationEvents.receiveAsFlow()
 
-    fun launch(route: DemoRoute) {
-        _navigationEvents.trySend(DemoNavigationIntent.NavigateTo(route))
+    override fun launch(route: DemoRoute) {
+        _navigationEvents.trySend(NavigationIntent.NavigateTo(route))
     }
 
-    fun replace(route: DemoRoute) {
-        _navigationEvents.trySend(DemoNavigationIntent.Replace(route))
+    override fun replace(route: DemoRoute) {
+        _navigationEvents.trySend(NavigationIntent.Replace(route))
     }
 
-    fun restart(route: DemoRoute) {
-        _navigationEvents.trySend(DemoNavigationIntent.Restart(route))
+    override fun restart(route: DemoRoute) {
+        _navigationEvents.trySend(NavigationIntent.Restart(route))
     }
 
-    fun goBack() {
-        _navigationEvents.trySend(DemoNavigationIntent.GoBack)
+    override fun goBack() {
+        _navigationEvents.trySend(NavigationIntent.GoBack)
     }
 }

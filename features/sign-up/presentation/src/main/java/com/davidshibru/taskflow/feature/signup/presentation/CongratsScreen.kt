@@ -12,9 +12,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.davidshibru.taskflow.core.navigation.dsl.ScreenScope
 import com.davidshibru.taskflow.core.navigation.dsl.toolbar
+import com.davidshibru.taskflow.core.navigation.dsl.viewModel
 import com.davidshibru.taskflow.core.theme.Dimens
 
 fun ScreenScope.congratsScreen() {
@@ -24,7 +24,7 @@ fun ScreenScope.congratsScreen() {
     }
 
     content {
-        val viewModel: CongratsViewModel = hiltViewModel()
+        val viewModel = viewModel<CongratsViewModel>()
 
         CongratsContent(
             onGoToSignIn = viewModel::goBackToSignIn

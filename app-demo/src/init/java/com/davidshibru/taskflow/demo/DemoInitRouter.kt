@@ -5,7 +5,11 @@ import com.davidshibru.taskflow.feature.init.presentation.InitRouter
 import javax.inject.Inject
 
 class DemoInitRouter @Inject constructor() : InitRouter {
-    override fun launchSignIn() {
-        Logger.d("Успешный вход в SignIn")
+    override fun launchAuthFlow() {
+        Logger.d("Demo init: launch auth flow")
+    }
+
+    override fun launchMainFlow() {
+        Logger.d("Demo init: launch main flow")
     }
 }

@@ -1,6 +1,8 @@
 package com.davidshibru.taskflow.demo
 
+import com.davidshibru.taskflow.feature.chats.presentation.ChatsRouter
 import com.davidshibru.taskflow.features.main.presentation.MainRouter
+import com.davidshibru.taskflow.features.signin.presentation.SignInRouter
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -12,4 +14,10 @@ interface DemoNavigationModule {
 
     @Binds
     fun bindMainRouter(impl: DemoMainRouter): MainRouter
+
+    @Binds
+    fun bindChatsRouter(impl: DemoChatsRouter): ChatsRouter
+
+    @Binds
+    fun bindSignInRouter(impl: DemoMainFeatureSignInRouter): SignInRouter
 }

@@ -228,10 +228,10 @@ object CodeTemplates {
         import androidx.compose.runtime.getValue
         import androidx.compose.ui.Alignment
         import androidx.compose.ui.Modifier
-        import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
         import $basePackage.core.essentials.container.Container
         import $basePackage.core.navigation.dsl.ScreenScope
         import $basePackage.core.navigation.dsl.ScreenToolbar
+        import $basePackage.core.navigation.dsl.viewModel
         import $basePackage.core.theme.Dimens
         import $basePackage.core.theme.components.ContainerView
         import $basePackage.core.theme.previews.PreviewScreenContent
@@ -241,7 +241,7 @@ object CodeTemplates {
             toolbar = ScreenToolbar.Default(title = "$featureName")
             
             content {
-                val viewModel: ${featureName}ViewModel = hiltViewModel()
+                val viewModel = viewModel<${featureName}ViewModel>()
                 val container: Container<${featureName}ViewModel.State> by viewModel.stateFlow.collectAsState()
             
                 ContainerView(

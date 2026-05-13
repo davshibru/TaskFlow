@@ -45,6 +45,7 @@ dependencies {
     implementation(projects.core.essentials)
     implementation(projects.core.commonAndroid)
     implementation(projects.core.navigationDsl)
+    implementation(projects.navigationCommon)
 
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -76,6 +77,11 @@ dependencies {
 
     "mainFeatureImplementation"(projects.features.main.presentation)
     "mainFeatureImplementation"(projects.features.main.demo)
+    "mainFeatureImplementation"(projects.features.chats.presentation)
+    "mainFeatureImplementation"(projects.features.chats.demo)
+    "mainFeatureImplementation"(projects.features.signIn.presentation)
+    "mainFeatureImplementation"(projects.features.signIn.demo)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)

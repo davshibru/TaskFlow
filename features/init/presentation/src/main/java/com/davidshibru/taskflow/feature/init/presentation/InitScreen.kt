@@ -23,12 +23,12 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.davidshibru.taskflow.core.essentials.container.Container
 import com.davidshibru.taskflow.core.essentials.entities.Id
 import com.davidshibru.taskflow.core.essentials.entities.ImageSource
 import com.davidshibru.taskflow.core.navigation.dsl.ScreenScope
 import com.davidshibru.taskflow.core.navigation.dsl.ScreenToolbar
+import com.davidshibru.taskflow.core.navigation.dsl.viewModel
 import com.davidshibru.taskflow.core.theme.Dimens
 import com.davidshibru.taskflow.core.theme.MediumVerticalSpace
 import com.davidshibru.taskflow.core.theme.previews.PreviewScreenContent
@@ -44,7 +44,7 @@ fun ScreenScope.initScreen() {
     toolbar = ScreenToolbar.Hidden
 
     content {
-        val viewModel: InitViewModel = hiltViewModel()
+        val viewModel = viewModel<InitViewModel>()
         val container: Container<State> by viewModel.stateFlow.collectAsState()
 
         ContainerView(

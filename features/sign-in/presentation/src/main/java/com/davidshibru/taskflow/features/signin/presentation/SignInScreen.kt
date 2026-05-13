@@ -31,11 +31,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.davidshibru.taskflow.core.essentials.container.Container
 import com.davidshibru.taskflow.core.essentials.logger.Logger
 import com.davidshibru.taskflow.core.navigation.dsl.ScreenScope
 import com.davidshibru.taskflow.core.navigation.dsl.toolbar
+import com.davidshibru.taskflow.core.navigation.dsl.viewModel
 import com.davidshibru.taskflow.core.theme.Dimens
 import com.davidshibru.taskflow.core.theme.components.ContainerView
 import com.davidshibru.taskflow.core.theme.components.ProgressButton
@@ -46,7 +46,7 @@ import com.davidshibru.taskflow.features.signin.domain.entities.InputField
 
 fun ScreenScope.signInScreen() {
     content {
-        val viewModel: SignInViewModel = hiltViewModel()
+        val viewModel = viewModel<SignInViewModel>()
 
         toolbar {
             title = "Sign in"

@@ -29,11 +29,11 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.davidshibru.taskflow.core.essentials.container.Container
 import com.davidshibru.taskflow.core.essentials.logger.Logger
 import com.davidshibru.taskflow.core.navigation.dsl.ScreenScope
 import com.davidshibru.taskflow.core.navigation.dsl.toolbar
+import com.davidshibru.taskflow.core.navigation.dsl.viewModel
 import com.davidshibru.taskflow.core.theme.Dimens
 import com.davidshibru.taskflow.core.theme.components.ContainerView
 import com.davidshibru.taskflow.core.theme.components.ProgressButton
@@ -51,7 +51,7 @@ import kotlinx.collections.immutable.persistentMapOf
 
 fun ScreenScope.signUpScreen() {
     content {
-        val viewModel: SignUpViewModel = hiltViewModel()
+        val viewModel = viewModel<SignUpViewModel>()
 
         toolbar {
             title = "Sign up"
