@@ -224,7 +224,7 @@ class TemplateGeneratorImpl {
         )
         ProjectUtils.addToGitIfRequested("$basePath/demo/src/main/java", args)
 
-        updateCoreNavigation(
+        updateNavigation(
             featureName = featureName,
             moduleName = args.moduleName,
             presentationPackageName = presentationPackageName,
@@ -247,10 +247,10 @@ class TemplateGeneratorImpl {
     private fun addFeatureIntegrationFilesToGit(args: InputArgs) {
         listOf(
             "settings.gradle.kts",
-            "core/navigation/build.gradle.kts",
-            "core/navigation/src/main/java/com/davidshibru/taskflow/core/navigation/Route.kt",
-            "core/navigation/src/main/java/com/davidshibru/taskflow/core/navigation/AppNavGraph.kt",
-            "core/navigation/src/main/java/com/davidshibru/taskflow/core/navigation/di/RoutersModule.kt",
+            "navigation/build.gradle.kts",
+            "navigation/src/main/java/com/davidshibru/taskflow/core/navigation/Route.kt",
+            "navigation/src/main/java/com/davidshibru/taskflow/core/navigation/AppNavGraph.kt",
+            "navigation/src/main/java/com/davidshibru/taskflow/core/navigation/di/RoutersModule.kt",
             "app-demo/build.gradle.kts",
         ).forEach { path ->
             ProjectUtils.addToGitIfRequested(path, args)
@@ -403,7 +403,7 @@ class TemplateGeneratorImpl {
         println("✅ Finished generating module at: $path")
     }
 
-    private fun updateCoreNavigation(
+    private fun updateNavigation(
         featureName: String,
         moduleName: String,
         presentationPackageName: String,
@@ -412,33 +412,34 @@ class TemplateGeneratorImpl {
     ) {
         val routeName = "${featureName}Route"
         val presentationAccessor = toTypeSafeAccessor("${moduleName}:presentation")
+        val navigationPath = "navigation"
 
         ProjectUtils.insertAfterIfMissing(
-            path = "core/navigation/build.gradle.kts",
+            path = "$navigationPath/build.gradle.kts",
             marker = "dependencies {",
             textToInsert = "    implementation($presentationAccessor)",
             uniqueMarker = "implementation($presentationAccessor)"
         )
 
         ProjectUtils.appendIfMissing(
-            path = "core/navigation/src/main/java/com/davidshibru/taskflow/core/navigation/Route.kt",
+            path = "$navigationPath/src/main/java/com/davidshibru/taskflow/core/navigation/Route.kt",
             textToAppend = "@Serializable\ndata object $routeName : Route",
             uniqueMarker = "data object $routeName : Route"
         )
 
         ProjectUtils.ensureImport(
-            path = "core/navigation/src/main/java/com/davidshibru/taskflow/core/navigation/AppNavGraph.kt",
+            path = "$navigationPath/src/main/java/com/davidshibru/taskflow/core/navigation/AppNavGraph.kt",
             importLine = "import $presentationPackageName.$screenFunctionName"
         )
         ProjectUtils.insertBeforeIfMissing(
-            path = "core/navigation/src/main/java/com/davidshibru/taskflow/core/navigation/AppNavGraph.kt",
+            path = "$navigationPath/src/main/java/com/davidshibru/taskflow/core/navigation/AppNavGraph.kt",
             marker = "}",
             textToInsert = "    composable<$routeName> { $screenFunctionName() }",
             uniqueMarker = "composable<$routeName> { $screenFunctionName() }"
         )
 
         val routerFilePath =
-            "core/navigation/src/main/java/com/davidshibru/taskflow/core/navigation/routers/${featureName}RouterImpl.kt"
+            "$navigationPath/src/main/java/com/davidshibru/taskflow/core/navigation/routers/${featureName}RouterImpl.kt"
         ProjectUtils.writeFile(
             routerFilePath,
             CodeTemplates.appRouterClass(
@@ -450,7 +451,7 @@ class TemplateGeneratorImpl {
         ProjectUtils.addToGitIfRequested(routerFilePath, args)
 
         val routersModulePath =
-            "core/navigation/src/main/java/com/davidshibru/taskflow/core/navigation/di/RoutersModule.kt"
+            "$navigationPath/src/main/java/com/davidshibru/taskflow/core/navigation/di/RoutersModule.kt"
         ProjectUtils.ensureImport(
             path = routersModulePath,
             importLine = "import com.davidshibru.taskflow.core.navigation.routers.${featureName}RouterImpl"
