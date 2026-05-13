@@ -12,11 +12,9 @@ class DemoSignInRepository @Inject constructor() : SignInRepository {
     override suspend fun signIn(credentials: Credentials): Token {
         delay(2000L)
         if (credentials.login == "admin" && credentials.password == "123") {
-            return FakeToken
+            return Token("demo-token")
         } else {
             throw Exception("Invalid credentials")
         }
     }
-
-    private data object FakeToken : Token
 }
