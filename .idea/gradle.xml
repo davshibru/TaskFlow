@@ -30,7 +30,6 @@
             <option value="$PROJECT_DIR$/core/common-android" />
             <option value="$PROJECT_DIR$/core/data" />
             <option value="$PROJECT_DIR$/core/essentials" />
-            <option value="$PROJECT_DIR$/core/navigation" />
             <option value="$PROJECT_DIR$/core/navigation-dsl" />
             <option value="$PROJECT_DIR$/core/network" />
             <option value="$PROJECT_DIR$/core/presentation" />
@@ -59,6 +58,8 @@
             <option value="$PROJECT_DIR$/features/sign-up/domain" />
             <option value="$PROJECT_DIR$/features/sign-up/presentation" />
             <option value="$PROJECT_DIR$/glue" />
+            <option value="$PROJECT_DIR$/navigation" />
+            <option value="$PROJECT_DIR$/navigation-common" />
             <option value="$PROJECT_DIR$/template" />
             <option value="$PROJECT_DIR$/template/android-library" />
             <option value="$PROJECT_DIR$/template/kotlin-library" />
