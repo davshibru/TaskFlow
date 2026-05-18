@@ -448,6 +448,7 @@ object CodeTemplates {
     fun presentationStringsXml(errorStringName: String, featureName: String) = """
         <?xml version="1.0" encoding="utf-8"?>
         <resources>
+            <string name="${featureName}_title">${featureName}</string>
             <string name="$errorStringName">Something went wrong in $featureName</string>
         </resources>
     """.trimIndent()

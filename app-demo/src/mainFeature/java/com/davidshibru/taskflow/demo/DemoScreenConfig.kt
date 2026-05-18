@@ -9,10 +9,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import com.davidshibru.taskflow.feature.chats.presentation.chatsScreen
 import com.davidshibru.taskflow.features.main.presentation.Tab
 import com.davidshibru.taskflow.features.main.presentation.mainScreen
-import com.davidshibru.taskflow.features.signin.presentation.signInScreen
+import com.davidshibru.taskflow.features.profile.presentation.profileScreen
 import kotlinx.serialization.Serializable
 
 import com.davidshibru.taskflow.feature.chats.presentation.R as ChatsR
+import com.davidshibru.taskflow.features.profile.presentation.R as ProfileR
 
 @Serializable
 private data object MainDemoRoute : DemoRoute
@@ -24,9 +25,9 @@ private data object ChatsDemoRoute : DemoRoute, Tab {
 }
 
 @Serializable
-private data object SignInDemoRoute : DemoRoute, Tab {
+private data object ProfileDemoRoute : DemoRoute, Tab {
     override val icon: ImageVector = Icons.Default.AccountBox
-    override val label: Context.() -> String = { "Profile" }
+    override val label: Context.() -> String = { getString(ProfileR.string.profile_title) }
 }
 
 @Composable
@@ -35,13 +36,8 @@ fun DemoScreen(demoNavigator: DemoNavigator) {
         navigator = demoNavigator,
         startDestination = MainDemoRoute,
     ) {
-        composable<MainDemoRoute> {
-            mainScreen(
-                ChatsDemoRoute,
-                SignInDemoRoute,
-            )
-        }
+        composable<MainDemoRoute> { mainScreen(ChatsDemoRoute, ProfileDemoRoute) }
         composable<ChatsDemoRoute> { chatsScreen() }
-        composable<SignInDemoRoute> { signInScreen() }
+        composable<ProfileDemoRoute> { profileScreen() }
     }
 }

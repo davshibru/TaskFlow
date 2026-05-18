@@ -15,6 +15,10 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
 
+import com.davidshibru.taskflow.core.navigation.routers.ProfileRouterImpl
+
+import com.davidshibru.taskflow.features.profile.presentation.ProfileRouter
+
 @Module
 @InstallIn(ViewModelComponent::class)
 interface RoutersModule {
@@ -43,4 +47,9 @@ interface RoutersModule {
     fun bindMainRouter(
         mainRouterImpl: MainRouterImpl,
     ): MainRouter
+    
+    @Binds
+    fun bindProfileRouter(
+        profileRouterImpl: ProfileRouterImpl,
+    ): ProfileRouter
 }

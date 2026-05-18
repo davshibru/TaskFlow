@@ -7,11 +7,10 @@ import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation3.runtime.NavKey
 import com.davidshibru.taskflow.core.navigation.dsl.BaseRoute
-import com.davidshibru.taskflow.feature.chats.presentation.R
 import com.davidshibru.taskflow.features.main.presentation.Tab
 import kotlinx.serialization.Serializable
-
 import com.davidshibru.taskflow.feature.chats.presentation.R as ChatsR
+import com.davidshibru.taskflow.features.profile.presentation.R as ProfileR
 
 @Serializable
 sealed interface Route : NavKey, BaseRoute
@@ -23,10 +22,13 @@ data object ChatsRoute : Route, Tab {
 }
 
 @Serializable
-data object SignInRoute : Route, Tab {
+data object ProfileRoute : Route, Tab {
     override val icon: ImageVector = Icons.Default.AccountBox
-    override val label: Context.() -> String = { "Profile" }
+    override val label: Context.() -> String = { getString(ProfileR.string.profile_title) }
 }
+
+@Serializable
+data object SignInRoute : Route
 
 @Serializable
 data object InitRoute : Route
@@ -36,6 +38,5 @@ data object SignUpRoute : Route
 
 @Serializable
 data object CongratsRoute : Route
-
 @Serializable
 data object MainRoute : Route

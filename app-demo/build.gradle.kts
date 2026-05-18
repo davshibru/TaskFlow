@@ -32,6 +32,10 @@ android {
             dimension = "feature"
             applicationIdSuffix = ".main"
         }
+        create("profile") {
+            dimension = "feature"
+            applicationIdSuffix = ".profile"
+        }
     }
 
     defaultConfig {
@@ -74,13 +78,16 @@ dependencies {
     "signinImplementation"(projects.features.signIn.demo)
     "signupImplementation"(projects.features.signUp.presentation)
     "signupImplementation"(projects.features.signUp.demo)
+    "profileImplementation"(projects.features.profile.presentation)
+    "profileImplementation"(projects.features.profile.demo)
 
     "mainFeatureImplementation"(projects.features.main.presentation)
     "mainFeatureImplementation"(projects.features.main.demo)
     "mainFeatureImplementation"(projects.features.chats.presentation)
     "mainFeatureImplementation"(projects.features.chats.demo)
-    "mainFeatureImplementation"(projects.features.signIn.presentation)
-    "mainFeatureImplementation"(projects.features.signIn.demo)
+    "mainFeatureImplementation"(projects.features.profile.presentation)
+    "mainFeatureImplementation"(projects.features.profile.demo)
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

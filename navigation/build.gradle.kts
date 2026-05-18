@@ -8,6 +8,7 @@ android {
     namespace = "com.davidshibru.taskflow.core.navigation"
 }
 dependencies {
+    implementation(projects.features.profile.presentation)
     implementation(projects.navigationCommon)
 
     implementation(projects.features.main.presentation)

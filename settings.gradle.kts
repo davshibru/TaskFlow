@@ -69,3 +69,7 @@ include(":features:chats:demo")
 include(":features:main:domain")
 include(":features:main:presentation")
 include(":features:main:demo")
+
+include(":features:profile:domain")
+include(":features:profile:presentation")
+include(":features:profile:demo")
