@@ -9,6 +9,7 @@ dependencies {
     implementation(projects.features.init.domain)
     implementation(projects.features.signIn.domain)
     implementation(projects.features.signUp.domain)
+    implementation(projects.features.chats.domain)
 
     implementation(projects.data)
 

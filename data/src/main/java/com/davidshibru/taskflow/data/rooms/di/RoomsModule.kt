@@ -1,0 +1,16 @@
+package com.davidshibru.taskflow.data.rooms.di
+
+import com.davidshibru.taskflow.data.RoomsDataRepository
+import com.davidshibru.taskflow.data.rooms.RoomsDataRepositoryImpl
+import dagger.Binds
+import dagger.Module
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+
+@Module
+@InstallIn(SingletonComponent::class)
+internal interface RoomsModule {
+
+    @Binds
+    fun bindRoomsDataRepository(impl: RoomsDataRepositoryImpl): RoomsDataRepository
+}
