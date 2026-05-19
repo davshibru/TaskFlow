@@ -8,4 +8,5 @@
     <string name="invalid_response_from_the_remote_server">Invalid response from the remote server</string>
     <string name="common_delete">Delete</string>
     <string name="common_cancel">Cancel</string>
+    <string name="common_auth_error_message">User session has been expired.</string>
 </resources>
