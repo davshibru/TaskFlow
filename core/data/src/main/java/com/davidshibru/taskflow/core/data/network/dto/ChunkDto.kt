@@ -16,12 +16,9 @@ data class ChunkDto<T>(
     override val data: List<T> = chunk
 
     @Transient
-    override val next: PageToken? = start?.let(::PageTokenImpl)
-
-    @Transient
-    override val previous: PageToken? = start?.let(::PageTokenImpl)
+    override val next: PageToken? = end?.let(::PageTokenImpl)
 
     private data class PageTokenImpl(
-        val value: String,
+        override val value: String,
     ): PageToken
 }

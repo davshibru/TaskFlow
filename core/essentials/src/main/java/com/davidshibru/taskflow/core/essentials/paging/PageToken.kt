@@ -1,3 +1,5 @@
 package com.davidshibru.taskflow.core.essentials.paging
 
-interface PageToken
+interface PageToken {
+    val value: String
+}

@@ -1,13 +1,17 @@
 package com.davidshibru.taskflow.data.rooms.remote
 
 import com.davidshibru.taskflow.core.data.network.dto.ChunkDto
+import com.davidshibru.taskflow.core.data.network.dto.DirectionQueryParam
 import com.davidshibru.taskflow.core.data.network.dto.EventDto
+import com.davidshibru.taskflow.core.data.network.dto.PageTokenQueryParam
 import com.davidshibru.taskflow.core.essentials.container.Container.Completed
 import com.davidshibru.taskflow.data.rooms.entities.RoomDataEntityId
 import com.davidshibru.taskflow.data.rooms.remote.dto.JoinedRoomIdsResponseDto
 import com.davidshibru.taskflow.data.rooms.remote.dto.RoomMemberContentDto
+import kotlinx.serialization.json.JsonElement
 import retrofit2.http.GET
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 internal interface RoomsApi {
 
@@ -18,5 +22,12 @@ internal interface RoomsApi {
     suspend fun getRoomMembers(
         @Path("roomId") roomId: RoomDataEntityId,
     ): Completed<ChunkDto<EventDto<RoomMemberContentDto>>>
+
+    @GET("rooms/{roomId}/messages")
+    suspend fun getRoomMessages(
+        @Path("roomId") roomId: RoomDataEntityId,
+        @Query("dir") direction: DirectionQueryParam = DirectionQueryParam.Backward,
+        @Query("from") from: PageTokenQueryParam? = null,
+    ): Completed<ChunkDto<EventDto<JsonElement>>>
 
 }

@@ -4,6 +4,5 @@ interface PagedData<T> {
 
     val data: List<T>
     val next: PageToken?
-    val previous: PageToken?
 
 }
