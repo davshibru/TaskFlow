@@ -2,8 +2,8 @@ package com.davidshibru.taskflow.feature.chats.presentation
 
 import androidx.lifecycle.viewModelScope
 import com.davidshibru.taskflow.core.essentials.container.Container
-import com.davidshibru.taskflow.core.essentials.container.asContainerStateFlow
 import com.davidshibru.taskflow.core.essentials.container.containerMap
+import com.davidshibru.taskflow.core.essentials.container.map
 import com.davidshibru.taskflow.core.essentials.entities.Id
 import com.davidshibru.taskflow.core.presentation.WithMviState
 import com.davidshibru.taskflow.core.presentation.base.AbstractViewModel
@@ -15,9 +15,10 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
@@ -34,8 +35,12 @@ class ChatsViewModel @Inject constructor(
 
     private val _stateFlow = MutableStateFlow(StateImpl())
     val stateFlow: StateFlow<Container<State>> = combine(_stateFlow, reducer) { state, chats ->
-        state.copy(originChats = chats.unwrap())
-    }.asContainerStateFlow(viewModelScope)
+        chats.map { state.copy(originChats = it) }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000L),
+        initialValue = Container.Loading,
+    )
 
     fun executeAction(action: ChatsAction) = when (action) {
         is ChatsAction.DeleteChat -> deleteChat(chatId = action.chatId)

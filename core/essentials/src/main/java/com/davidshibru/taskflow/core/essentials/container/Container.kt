@@ -1,5 +1,7 @@
 package com.davidshibru.taskflow.core.essentials.container
 
+import com.davidshibru.taskflow.core.essentials.container.Container.Loading
+import com.davidshibru.taskflow.core.essentials.container.Container.Success
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlin.reflect.KClass
@@ -23,7 +25,7 @@ sealed class Container<out T> {
         onError: ContainerScope.(Exception) -> R,
         onLoading: () -> R,
     ): R {
-        return when(this) {
+        return when (this) {
             is Error -> this.onError(exception)
             Loading -> onLoading()
             is Success<T> -> this.onSuccess(value)
@@ -37,35 +39,35 @@ sealed class Container<out T> {
     fun <T> successContainer(
         value: T,
         reloadAction: ReloadAction = { _ -> },
-    ) : Success<T> {
+    ): Success<T> {
         return Success(value, reloadAction)
     }
 
     fun errorContainer(
         exception: Exception,
         reloadAction: ReloadAction = { _ -> },
-    ) : Error {
+    ): Error {
         return Error(exception, reloadAction)
     }
 
-    fun loadingContainer() : Loading = Loading
+    fun loadingContainer(): Loading = Loading
 
     companion object {
         fun <T> success(
             value: T,
             reloadAction: ReloadAction = { _ -> },
-        ) : Success<T> {
+        ): Success<T> {
             return Success(value, reloadAction)
         }
 
         fun error(
             exception: Exception,
             reloadAction: ReloadAction = { _ -> },
-        ) : Error {
+        ): Error {
             return Error(exception, reloadAction)
         }
 
-        fun loading() : Loading = Loading
+        fun loading(): Loading = Loading
     }
 
     fun unwrap(): T {
@@ -91,6 +93,47 @@ sealed class Container<out T> {
     ) : Completed<T>()
 }
 
+/**
+ * Updates properties of a completed container.
+ */
+fun <T> Container<T>.update(
+    block: ContainerScopeUpdate.() -> Unit
+): Container<T> {
+    return if (this is Container.Completed) {
+        val updateScope = ContainerScopeUpdate(
+            reloadAction = this.reloadAction,
+            isLoading = this.isLoading,
+        ).apply(block)
+        when (this) {
+            is Container.Success -> this.copy(
+                reloadAction = updateScope.reloadAction,
+                isLoading = updateScope.isLoading
+            )
+
+            is Container.Error -> this.copy(
+                reloadAction = updateScope.reloadAction,
+                isLoading = updateScope.isLoading
+            )
+        }
+    } else {
+        this
+    }
+}
+
+/**
+ * Allows updating the properties of [Container.Completed] items in the flow.
+ */
+fun <T> Flow<Container<T>>.containerUpdate(
+    block: ContainerScopeUpdate.() -> Unit
+): Flow<Container<T>> {
+    return map { it.update(block) }
+}
+
+class ContainerScopeUpdate(
+    var reloadAction: ReloadAction,
+    var isLoading: Boolean = false,
+)
+
 fun <T, R> Container<T>.map(mapper: (T) -> R): Container<R> {
     return fold(
         onSuccess = { Container.Success(mapper(it), reloadAction, isLoading) },
@@ -100,9 +143,14 @@ fun <T, R> Container<T>.map(mapper: (T) -> R): Container<R> {
 }
 
 fun <T, R> Container.Completed<T>.map(mapper: (T) -> R): Container.Completed<R> {
-    return when(this) {
-        is Container.Error -> { Container.Error(this.exception, reloadAction, isLoading) }
-        is Container.Success<T> -> { Container.Success(mapper(value), reloadAction, isLoading) }
+    return when (this) {
+        is Container.Error -> {
+            Container.Error(this.exception, reloadAction, isLoading)
+        }
+
+        is Container.Success<T> -> {
+            Container.Success(mapper(value), reloadAction, isLoading)
+        }
     }
 }
 
@@ -160,17 +208,17 @@ fun <T, R> Flow<Container<T>>.containerMap(mapper: (T) -> R): Flow<Container<R>>
 inline fun <T, R : Any> Container<T>.foldNullable(
     noinline onSuccess: ContainerScope.(T) -> R? = { null },
     noinline onError: ContainerScope.(Exception) -> R? = { null },
-    noinline onLoading: () -> R? = { null},
+    noinline onLoading: () -> R? = { null },
 ): R? {
     return fold(onSuccess = onSuccess, onError = onError, onLoading = onLoading)
 }
 
 fun <T> Container<T>.getExceptionOrNull(): Exception? {
-    return foldNullable(onError = { it },)
+    return foldNullable(onError = { it })
 }
 
 fun <T> Container<T>.getValueOrNull(): T? {
-    return foldNullable(onSuccess = { it },)
+    return foldNullable(onSuccess = { it })
 }
 
 fun <T> Container.Completed<T>.withLoading(
