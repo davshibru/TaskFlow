@@ -1,12 +1,9 @@
-package com.davidshibru.taskflow.data.rooms
+package com.davidshibru.taskflow.data.rooms.fetchers
 
-import com.davidshibru.taskflow.core.data.paging.PagingUtils
-import com.davidshibru.taskflow.core.data.paging.firstEventOfType
 import com.davidshibru.taskflow.core.essentials.entities.UserId
 import com.davidshibru.taskflow.data.rooms.entities.RoomDataEntity
 import com.davidshibru.taskflow.data.rooms.entities.RoomDataEntityId
 import com.davidshibru.taskflow.data.rooms.remote.RoomsApi
-import com.davidshibru.taskflow.data.rooms.remote.dto.RoomMessageContentDto
 import javax.inject.Inject
 
 internal interface RoomFetcher {
@@ -32,14 +29,14 @@ internal class RoomFetcherImpl constructor(
 
     private val currentUserId = params.currentUserId
     private val roomsApi: RoomsApi = dependencies.roomsApi
-    private val pagingUtils: PagingUtils = dependencies.pagingUtils
+    private val roomBasicMessagesInfoFetcher = dependencies.roomBasicMessagesInfoFetcher
 
     override suspend fun fetchRoom(
         roomId: RoomDataEntityId
     ): RoomDataEntity? {
         val title = fetchRoomTitle(currentUserId, roomId) ?: return null
-        val lastMessage = fetchRoomLastMessage(roomId)
-        return RoomDataEntity(roomId, title, lastMessage)
+        val messagesBasicInfo = roomBasicMessagesInfoFetcher.fetchBasicMessagesInfo(roomId)
+        return RoomDataEntity(roomId, title, messagesBasicInfo.lastMessage)
     }
 
     private suspend fun fetchRoomTitle(
@@ -55,19 +52,9 @@ internal class RoomFetcherImpl constructor(
             ?.displayname
     }
 
-    private suspend fun fetchRoomLastMessage(
-        roomId: RoomDataEntityId,
-    ): String? {
-        return pagingUtils.firstEventOfType(
-            eventType = RoomMessageContentDto.Type
-        ) { pageToken ->
-            roomsApi.getRoomMessages(roomId = roomId, from = pageToken)
-        }?.body
-    }
-
     class Dependencies @Inject constructor(
         val roomsApi: RoomsApi,
-        val pagingUtils: PagingUtils,
+        val roomBasicMessagesInfoFetcher: RoomBasicMessagesInfoFetcher,
     )
 
     class FactoryImpl @Inject constructor(

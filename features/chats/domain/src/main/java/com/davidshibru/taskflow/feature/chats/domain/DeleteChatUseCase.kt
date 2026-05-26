@@ -1,9 +1,9 @@
 package com.davidshibru.taskflow.feature.chats.domain
 
-import com.davidshibru.taskflow.core.essentials.entities.Id
+import com.davidshibru.taskflow.feature.chats.domain.entities.ChatId
 
 interface DeleteChatUseCase {
 
-    suspend operator fun invoke(chatId: Id)
+    suspend operator fun invoke(chatId: ChatId)
 
 }

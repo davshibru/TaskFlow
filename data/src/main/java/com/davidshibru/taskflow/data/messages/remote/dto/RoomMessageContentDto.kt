@@ -1,4 +1,4 @@
-package com.davidshibru.taskflow.data.rooms.remote.dto
+package com.davidshibru.taskflow.data.messages.remote.dto
 
 import com.davidshibru.taskflow.core.data.network.dto.EventType
 import kotlinx.serialization.Serializable

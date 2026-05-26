@@ -1,8 +1,8 @@
 package com.davidshibru.taskflow.data.rooms.di
 
 import com.davidshibru.taskflow.data.RoomsDataRepository
-import com.davidshibru.taskflow.data.rooms.RoomFetcher
-import com.davidshibru.taskflow.data.rooms.RoomFetcherImpl
+import com.davidshibru.taskflow.data.rooms.fetchers.RoomFetcher
+import com.davidshibru.taskflow.data.rooms.fetchers.RoomFetcherImpl
 import com.davidshibru.taskflow.data.rooms.RoomsDataRepositoryImpl
 import dagger.Binds
 import dagger.Module

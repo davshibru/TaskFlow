@@ -10,6 +10,7 @@ import com.davidshibru.taskflow.core.presentation.base.AbstractViewModel
 import com.davidshibru.taskflow.feature.chats.domain.DeleteChatUseCase
 import com.davidshibru.taskflow.feature.chats.domain.GetChatsUseCase
 import com.davidshibru.taskflow.feature.chats.domain.entities.Chat
+import com.davidshibru.taskflow.feature.chats.domain.entities.ChatId
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -46,7 +47,7 @@ class ChatsViewModel @Inject constructor(
         is ChatsAction.DeleteChat -> deleteChat(chatId = action.chatId)
     }
 
-    private fun deleteChat(chatId: Id) = launch {
+    private fun deleteChat(chatId: ChatId) = launch {
         try {
             disableChat(chatId = chatId)
             deleteChatsUseCase.invoke(chatId = chatId)
@@ -56,11 +57,11 @@ class ChatsViewModel @Inject constructor(
     }
 
     private fun enableChat(chatId: Id) = _stateFlow.update { currentState ->
-        currentState.copy(disabledChatIds = _stateFlow.value.disabledChatIds - chatId)
+        currentState.copy(disabledChatIds = currentState.disabledChatIds - chatId)
     }
 
     private fun disableChat(chatId: Id) = _stateFlow.update { currentState ->
-        currentState.copy(disabledChatIds = _stateFlow.value.disabledChatIds + chatId)
+        currentState.copy(disabledChatIds = currentState.disabledChatIds + chatId)
     }
 
     interface State {

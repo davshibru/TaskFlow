@@ -8,4 +8,5 @@
     <string name="chats_create_chat">Create Chat</string>
     <string name="chats_no_messages">no messages</string>
     <string name="chats_delete_chat">Delete Chat</string>
+    <string name="chats_not_found_error">The chat with ID = %1$s does not exist</string>
 </resources>

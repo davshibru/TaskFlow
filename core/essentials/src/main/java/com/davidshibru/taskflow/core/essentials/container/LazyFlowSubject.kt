@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onStart
 
 interface LazyFlowSubject<T> {
@@ -14,6 +15,12 @@ interface LazyFlowSubject<T> {
         emitReloadFunction: Boolean = true,
         emitBackgroundLoads: Boolean = true,
     ): Flow<Container<T>>
+
+    fun reload(silently: Boolean = false): Boolean
+
+    suspend fun reloadAsync(silently: Boolean = false)
+
+    fun updateIfSuccess(mapper: (T) -> T): Boolean
 
     companion object {
         fun <T> create(
@@ -44,9 +51,15 @@ private class DefaultLazyFlowSubject<T>(
     private val loader: suspend LazyFlowSubjectScope<T>.() -> Unit,
     private val cacheTimeoutMillis: Long,
 ) : LazyFlowSubject<T> {
-    private val loadTrigger = MutableSharedFlow<Boolean>(replay = 1).apply {
+    private val loadTrigger = MutableSharedFlow<Boolean>(
+        replay = 1,
+        extraBufferCapacity = 1,
+    ).apply {
         tryEmit(false)
     }
+    private val updateTrigger = MutableSharedFlow<Container.Completed<T>>(
+        extraBufferCapacity = 1,
+    )
     private var lastCompletedContainer: Container.Completed<T>? = null
     private var lastCompletedTimeMillis: Long = 0L
 
@@ -56,42 +69,66 @@ private class DefaultLazyFlowSubject<T>(
         emitBackgroundLoads: Boolean,
     ): Flow<Container<T>> {
         val reloadAction: ReloadAction = if (emitReloadFunction) {
-            { silently -> loadTrigger.tryEmit(silently) }
+            { silently -> reload(silently) }
         } else {
             { _ -> }
         }
 
-        return loadTrigger
-            .flatMapLatest { silently ->
-                flow {
-                    val lazyFlowSubjectScope = LazyFlowSubjectScopeImpl(
-                        collector = this,
-                        reloadAction = reloadAction,
-                        onContainerCreated = { container ->
-                            lastCompletedContainer = container
-                            lastCompletedTimeMillis = System.currentTimeMillis()
-                        }
-                    )
+        return merge(
+            loadTrigger
+                .flatMapLatest { silently ->
+                    flow {
+                        val lazyFlowSubjectScope = LazyFlowSubjectScopeImpl(
+                            collector = this,
+                            reloadAction = reloadAction,
+                            onContainerCreated = { container ->
+                                updateLastCompletedContainer(container)
+                            }
+                        )
 
-                    lazyFlowSubjectScope.loader()
-                }.onStart {
-                    val currentContainer = lastCompletedContainer
-                    if (
-                        currentContainer != null &&
-                        emitBackgroundLoads &&
-                        (silently || isCacheValid())
-                    ) {
-                        emit(currentContainer.withLoading(isLoading = true))
-                    } else {
-                        emit(Container.Loading)
+                        lazyFlowSubjectScope.loader()
+                    }.onStart {
+                        val currentContainer = lastCompletedContainer
+                        if (
+                            currentContainer != null &&
+                            emitBackgroundLoads &&
+                            (silently || isCacheValid())
+                        ) {
+                            emit(currentContainer.withLoading(isLoading = true))
+                        } else {
+                            emit(Container.Loading)
+                        }
+                    }.catch { error ->
+                        val container = Container.Error(error as Exception, reloadAction)
+                        updateLastCompletedContainer(container)
+                        emit(container)
                     }
-                }.catch { error ->
-                    val container = Container.Error(error as Exception, reloadAction)
-                    lastCompletedContainer = container
-                    lastCompletedTimeMillis = System.currentTimeMillis()
-                    emit(container)
-                }
-            }
+                },
+            updateTrigger,
+        )
+    }
+
+    override fun reload(silently: Boolean): Boolean {
+        return loadTrigger.tryEmit(silently)
+    }
+
+    override suspend fun reloadAsync(silently: Boolean) {
+        loadTrigger.emit(silently)
+    }
+
+    override fun updateIfSuccess(mapper: (T) -> T): Boolean {
+        val currentContainer = lastCompletedContainer as? Container.Success<T> ?: return false
+        val updatedContainer = currentContainer.copy(value = mapper(currentContainer.value))
+
+        updateLastCompletedContainer(updatedContainer)
+        updateTrigger.tryEmit(updatedContainer)
+
+        return true
+    }
+
+    private fun updateLastCompletedContainer(container: Container.Completed<T>) {
+        lastCompletedContainer = container
+        lastCompletedTimeMillis = System.currentTimeMillis()
     }
 
     private fun isCacheValid(): Boolean {

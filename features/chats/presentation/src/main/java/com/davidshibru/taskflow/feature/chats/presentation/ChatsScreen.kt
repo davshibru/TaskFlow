@@ -40,7 +40,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import com.davidshibru.taskflow.core.essentials.container.Container
-import com.davidshibru.taskflow.core.essentials.entities.Id
 import com.davidshibru.taskflow.core.navigation.dsl.ScreenScope
 import com.davidshibru.taskflow.core.navigation.dsl.ScreenToolbar
 import com.davidshibru.taskflow.core.navigation.dsl.viewModel
@@ -49,6 +48,7 @@ import com.davidshibru.taskflow.core.theme.components.AvatarImageView
 import com.davidshibru.taskflow.core.theme.components.ContainerView
 import com.davidshibru.taskflow.core.theme.previews.PreviewScreenContent
 import com.davidshibru.taskflow.core.theme.previews.ScreenPreview
+import com.davidshibru.taskflow.feature.chats.domain.entities.ChatId
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
@@ -93,7 +93,7 @@ private fun BoxScope.ChatsContent(
 private fun ChatsList(
     modifier: Modifier = Modifier,
     chats: ImmutableList<UiChat>,
-    onDeleteChat: (chatId: Id) -> Unit = {},
+    onDeleteChat: (chatId: ChatId) -> Unit = {},
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
@@ -258,21 +258,21 @@ private fun ChatsContentPreview() = PreviewScreenContent {
 private data object PreviewState : ChatsViewModel.State {
     override val chats: ImmutableList<UiChat> = persistentListOf(
         UiChat(
-            id = Id(1),
+            id = ChatId("1"),
             title = "John",
             lastMessage = "Hello!",
             unreadMessageCount = 20,
             isEnabled = true,
         ),
         UiChat(
-            id = Id(2),
+            id = ChatId("2"),
             title = "Jane",
             lastMessage = "Lorem Ipsim Test Test!",
             unreadMessageCount = 1,
             isEnabled = false,
         ),
         UiChat(
-            id = Id(3),
+            id = ChatId("3"),
             title = "Gendalph White",
             lastMessage = null,
             unreadMessageCount = 0,

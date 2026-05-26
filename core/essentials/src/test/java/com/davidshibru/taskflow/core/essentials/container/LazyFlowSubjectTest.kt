@@ -69,6 +69,81 @@ class LazyFlowSubjectTest {
             assertFalse(reloaded.isLoading)
         }
     }
+
+    @Test
+    fun `GIVEN active listener WHEN reload THEN reload subject`() = runTest {
+        var loadCount = 0
+        val subject = DefaultSubjectFactory().create<Int> {
+            emit(++loadCount)
+        }
+
+        subject.listenReloadable().test {
+            assertEquals(Container.Loading, awaitItem())
+            assertEquals(1, awaitItem().unwrap())
+
+            assertTrue(subject.reload(silently = true))
+
+            val backgroundLoad = awaitItem() as Container.Success
+            assertEquals(1, backgroundLoad.value)
+            assertTrue(backgroundLoad.isLoading)
+
+            val reloaded = awaitItem() as Container.Success
+            assertEquals(2, reloaded.value)
+            assertFalse(reloaded.isLoading)
+        }
+    }
+
+    @Test
+    fun `GIVEN active listener WHEN reload async THEN reload subject`() = runTest {
+        var loadCount = 0
+        val subject = DefaultSubjectFactory().create<Int> {
+            emit(++loadCount)
+        }
+
+        subject.listenReloadable().test {
+            assertEquals(Container.Loading, awaitItem())
+            assertEquals(1, awaitItem().unwrap())
+
+            subject.reloadAsync(silently = true)
+
+            val backgroundLoad = awaitItem() as Container.Success
+            assertEquals(1, backgroundLoad.value)
+            assertTrue(backgroundLoad.isLoading)
+
+            val reloaded = awaitItem() as Container.Success
+            assertEquals(2, reloaded.value)
+            assertFalse(reloaded.isLoading)
+        }
+    }
+
+    @Test
+    fun `GIVEN active listener WHEN update if success THEN emit updated value`() = runTest {
+        val subject = DefaultSubjectFactory().create<List<Int>> {
+            emit(listOf(1, 2, 3))
+        }
+
+        subject.listenReloadable().test {
+            assertEquals(Container.Loading, awaitItem())
+            assertEquals(listOf(1, 2, 3), awaitItem().unwrap())
+
+            assertTrue(subject.updateIfSuccess { values ->
+                values.filter { it != 2 }
+            })
+
+            val updated = awaitItem() as Container.Success
+            assertEquals(listOf(1, 3), updated.value)
+            assertFalse(updated.isLoading)
+        }
+    }
+
+    @Test
+    fun `GIVEN no success value WHEN update if success THEN skip update`() = runTest {
+        val subject = DefaultSubjectFactory().create<Int> {
+            emit(1)
+        }
+
+        assertFalse(subject.updateIfSuccess { it + 1 })
+    }
 }
 
 private class TestLazyFlowSubject<T>(
@@ -78,4 +153,10 @@ private class TestLazyFlowSubject<T>(
         emitReloadFunction: Boolean,
         emitBackgroundLoads: Boolean,
     ): Flow<Container<T>> = flow
+
+    override fun reload(silently: Boolean): Boolean = true
+
+    override suspend fun reloadAsync(silently: Boolean) = Unit
+
+    override fun updateIfSuccess(mapper: (T) -> T): Boolean = true
 }

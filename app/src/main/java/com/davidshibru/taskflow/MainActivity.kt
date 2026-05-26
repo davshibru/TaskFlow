@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import com.davidshibru.taskflow.core.common.android.AndroidExceptionHandler
 import com.davidshibru.taskflow.core.navigation.AppNavHost
 import com.davidshibru.taskflow.core.navigation.base.AppNavigator
+import com.davidshibru.taskflow.core.navigation.base.impl.ComposeDialogs
 import com.davidshibru.taskflow.core.theme.material.TaskFlowTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -22,6 +23,9 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var exceptionHandler: AndroidExceptionHandler
 
+    @Inject
+    lateinit var composeDialogs: ComposeDialogs
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -30,6 +34,7 @@ class MainActivity : ComponentActivity() {
             TaskFlowTheme {
                 AppNavHost(modifier = Modifier.fillMaxSize(), appNavigator = appNavigator)
                 exceptionHandler.ErrorDialog()
+                composeDialogs.Renderer()
             }
         }
     }

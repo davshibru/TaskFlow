@@ -1,8 +1,8 @@
 package com.davidshibru.taskflow.feature.chats.presentation
 
-import com.davidshibru.taskflow.core.essentials.entities.Id
+import com.davidshibru.taskflow.feature.chats.domain.entities.ChatId
 
 sealed class ChatsAction {
 
-    data class DeleteChat(val chatId: Id): ChatsAction()
+    data class DeleteChat(val chatId: ChatId): ChatsAction()
 }
