@@ -1,6 +1,7 @@
 package com.davidshibru.taskflow.data.rooms
 
 import com.davidshibru.taskflow.core.data.network.containerOf
+import com.davidshibru.taskflow.core.essentials.collections.mapNotNullAsync
 import com.davidshibru.taskflow.core.essentials.container.Container
 import com.davidshibru.taskflow.core.essentials.container.LazyFlowSubject
 import com.davidshibru.taskflow.core.essentials.container.SubjectFactory
@@ -30,7 +31,7 @@ internal class RoomsDataRepositoryImpl @Inject constructor(
         delay(1000)
         val response = roomsApi.getJoinedRooms().unwrap()
         val roomFetcher = roomFetcher.create(sessionProvider.getCurrentUserId())
-        val rooms = response.joinedRoomsIds.mapNotNull { roomId ->
+        val rooms = response.joinedRoomsIds.mapNotNullAsync { roomId ->
             roomFetcher.fetchRoom(roomId)
         }
         emit(rooms)

@@ -11,6 +11,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -23,6 +24,7 @@ import com.davidshibru.taskflow.core.essentials.container.Container.Loading.succ
 import com.davidshibru.taskflow.core.essentials.container.ContainerScope
 import com.davidshibru.taskflow.core.essentials.exception.ConnectionException
 import com.davidshibru.taskflow.core.essentials.exception.mapper.ExceptionToMessageMapper
+import com.davidshibru.taskflow.core.essentials.logger.Logger
 import com.davidshibru.taskflow.core.theme.Dimens
 import com.davidshibru.taskflow.core.theme.MediumVerticalSpace
 import com.davidshibru.taskflow.core.theme.R
@@ -42,6 +44,9 @@ fun <T> ContainerView(
             },
             onError = { exception ->
                 val message = exceptionToMessageMapper.getLocalizedMessage(exception)
+                LaunchedEffect(exception) {
+                    Logger.e(exception)
+                }
                 ErrorContainerView(message = message, onReload = { retry() })
             },
             onSuccess = { value ->
